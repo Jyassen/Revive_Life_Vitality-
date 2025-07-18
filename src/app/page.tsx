@@ -1,15 +1,10 @@
 import React from 'react';
-// No Head component needed here, use Metadata API in layout.tsx or page.tsx
-// import Head from 'next/head';
-import Header from '@/components/layout/Header'; // Updated path alias
-import Footer from '@/components/layout/Footer'; // Updated path alias
 import HeroSection from '@/components/sections/HeroSection';
 import DailyRitualSection from '@/components/sections/DailyRitualSection';
 import HowToUseSection from '@/components/sections/HowToUseSection';
 import IngredientSpotlightSection from '@/components/sections/IngredientSpotlightSection';
 import { ProductFeaturesSection } from '@/components/sections/ProductFeatureSection';
 import FounderStorySection from '@/components/sections/FounderStorySection';
-import LifestyleSection from '@/components/sections/LifestyleSection';
 import TestimonialSection from '@/components/sections/TestimonialSection';
 import ComparisonSection from '@/components/sections/ComparisonSection';
 import PurchaseOptionsSection from '@/components/sections/PurchaseOptionsSection';
