@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#e3f2fd"/>
+  <circle cx="400" cy="300" r="200" fill="#90caf9"/>
+  <text x="400" y="290" font-family="Arial" font-size="42" text-anchor="middle" fill="#1565c0">Hydration</text>
+  <text x="400" y="340" font-family="Arial" font-size="42" text-anchor="middle" fill="#1565c0">and Recovery</text>
+</svg> 

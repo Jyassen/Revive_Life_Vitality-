@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#fff5e6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ffe0b2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="800" height="600" fill="url(#bg-gradient)" />
+  
+  <!-- Frame -->
+  <rect x="20" y="20" width="760" height="560" rx="8" fill="none" stroke="#f39c12" stroke-width="4" />
+  
+  <!-- Icon container -->
+  <circle cx="400" cy="250" r="100" fill="#f39c12" opacity="0.8" />
+  
+  <!-- Energy icon (lightning bolt) -->
+  <path d="M400,180 L380,260 L420,260 L400,320" 
+    fill="none" stroke="#ffffff" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" />
+  
+  <!-- Title -->
+  <text x="400" y="400" font-family="Arial, sans-serif" font-size="32" font-weight="bold" text-anchor="middle" fill="#2c3e50">
+    Daily Energize
+  </text>
+  
+  <!-- Description -->
+  <text x="400" y="440" font-family="Arial, sans-serif" font-size="18" text-anchor="middle" fill="#34495e">
+    Boost your energy levels naturally
+  </text>
+  
+  <!-- Ingredients list -->
+  <text x="400" y="480" font-family="Arial, sans-serif" font-size="16" text-anchor="middle" fill="#7f8c8d">
+    Ginseng • B Vitamins • Ginger • Green Tea
+  </text>
+  
+  <!-- Placeholder text -->
+  <text x="400" y="550" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#95a5a6">
+    Gallery Image - Daily Energize
+  </text>
+</svg> 

@@ -1,103 +1,71 @@
-import Image from "next/image";
+import React from 'react';
+// No Head component needed here, use Metadata API in layout.tsx or page.tsx
+// import Head from 'next/head';
+import Header from '@/components/layout/Header'; // Updated path alias
+import Footer from '@/components/layout/Footer'; // Updated path alias
+import HeroSection from '@/components/sections/HeroSection';
+import DailyRitualSection from '@/components/sections/DailyRitualSection';
+import HowToUseSection from '@/components/sections/HowToUseSection';
+import IngredientSpotlightSection from '@/components/sections/IngredientSpotlightSection';
+import { ProductFeaturesSection } from '@/components/sections/ProductFeatureSection';
+import FounderStorySection from '@/components/sections/FounderStorySection';
+import LifestyleSection from '@/components/sections/LifestyleSection';
+import TestimonialSection from '@/components/sections/TestimonialSection';
+import ComparisonSection from '@/components/sections/ComparisonSection';
+import PurchaseOptionsSection from '@/components/sections/PurchaseOptionsSection';
+import ContactSection from '@/components/sections/ContactSection';
 
-export default function Home() {
+// Define metadata for the page (App Router convention)
+// This replaces the <Head> component for static metadata
+export const metadata = {
+  title: 'Revive Life Vitality - Organic Wellness Shots',
+  description: 'Experience potent, organic cold-pressed wellness shots. Boost immunity and energy with our premium ingredients. Natural vitality in every bottle.',
+  // Add other metadata fields as needed (e.g., openGraph, twitter)
+  openGraph: {
+    title: 'Revive Life Vitality - Organic Wellness Shots',
+    description: 'Boost immunity and energy with our science-backed, cold-pressed elixirs.',
+    url: 'https://revivelifevitality.com',
+    images: [
+      {
+        url: '/images/og-image-placeholder.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Revive Life Vitality Wellness Shots',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Revive Life Vitality - Organic Wellness Shots',
+    description: 'Boost immunity and energy with our science-backed, cold-pressed elixirs.',
+    images: ['/images/og-image-placeholder.jpg'],
+  },
+  // Add favicon link in root layout (src/app/layout.tsx) instead
+  // icons: {
+  //   icon: '/favicon.ico',
+  // },
+};
+
+
+const HomePage: React.FC = () => {
+  // App Router uses a different structure - layout is handled in layout.tsx
+  // We just return the page content here.
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+    <main>
+      <HeroSection />
+      <ProductFeaturesSection />
+      <DailyRitualSection />
+      <HowToUseSection />
+      <IngredientSpotlightSection />
+      <FounderStorySection />
+      <ComparisonSection />
+      <TestimonialSection />
+      <PurchaseOptionsSection />
+      <ContactSection />
+    </main>
   );
-}
+};
+
+export default HomePage;

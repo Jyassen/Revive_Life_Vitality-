@@ -1,26 +1,67 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --font-inter: 'Inter', system-ui, sans-serif;
+  --font-playfair: 'Playfair Display', Georgia, serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  body {
+    @apply bg-brand-beige text-brand-dark;
+    font-feature-settings: "kern";
+    text-rendering: optimizeLegibility;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-playfair font-normal leading-tight;
+  }
+  
+  h1 {
+    @apply text-3xl md:text-4xl lg:text-5xl;
+  }
+  
+  h2 {
+    @apply text-2xl md:text-3xl lg:text-4xl;
+  }
+  
+  h3 {
+    @apply text-xl md:text-2xl lg:text-3xl;
+  }
+  
+  p {
+    @apply text-sm md:text-base leading-relaxed;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  .btn-primary {
+    @apply inline-block px-6 py-3 bg-brand-dark text-white font-normal text-sm 
+    tracking-wide uppercase transition duration-200 ease-in-out transform
+    hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-dark;
+  }
+  
+  .btn-outline {
+    @apply inline-block px-6 py-3 border border-brand-dark text-brand-dark font-normal text-sm
+    tracking-wide uppercase transition duration-200 ease-in-out transform
+    hover:bg-brand-dark hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-dark;
+  }
+  
+  .section-title {
+    @apply font-playfair text-2xl md:text-3xl font-normal mb-6 text-center;
+  }
+  
+  .product-card {
+    @apply bg-white overflow-hidden transition-transform duration-300;
+  }
 }
