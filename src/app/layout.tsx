@@ -3,6 +3,7 @@ import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import { CartProvider } from "@/context/CartContext";
 
 const inter = Inter({ 
   subsets: ["latin"],
@@ -38,9 +39,11 @@ export default function RootLayout({
         className={`${inter.variable} ${playfair.variable} font-sans bg-brand-beige`}
         suppressHydrationWarning
       >
-        <Header />
-        {children}
-        <Footer />
+        <CartProvider>
+          <Header />
+          {children}
+          <Footer />
+        </CartProvider>
       </body>
     </html>
   );

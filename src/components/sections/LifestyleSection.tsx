@@ -61,7 +61,7 @@ const LifestyleSection: React.FC = () => {
           <div className="bg-white p-8 rounded-lg shadow-sm">
             <h3 className="text-xl font-medium text-brand-dark mb-4">Morning: Immunity</h3>
             <p className="text-gray-600 mb-6">
-              Start your morning with <span className="font-medium">Manuka Honey Immune Boost</span> – on an empty stomach or with your breakfast smoothie. It's like your daily wellness shot to kickstart immunity.
+              Start your morning with <span className="font-medium">Manuka Honey Immune Boost</span> – on an empty stomach or with your breakfast smoothie. It&apos;s like your daily wellness shot to kickstart immunity.
             </p>
             <div className="relative h-[250px] w-full">
               <Image
@@ -107,7 +107,7 @@ const LifestyleSection: React.FC = () => {
         </div>
 
         <div className="text-center">
-          <p className="text-lg text-brand-dark mb-6">You've got goals – we make them easier. Just a few seconds each day can build your immunity and fuel your workouts.</p>
+          <p className="text-lg text-brand-dark mb-6">You&apos;ve got goals – we make them easier. Just a few seconds each day can build your immunity and fuel your workouts.</p>
           <button 
             onClick={handleShopNowClick}
             className="btn-primary py-3 px-8"

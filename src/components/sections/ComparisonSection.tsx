@@ -175,7 +175,7 @@ const ComparisonSection: React.FC = () => {
 
         <div className="text-center mt-12">
           <p className="text-lg text-brand-dark font-medium">
-            In short, Revive Life Vitality offers what others can't: <span className="font-bold">clean, effective, and enjoyable</span> wellness in a shot.
+            In short, Revive Life Vitality offers what others can&apos;t: <span className="font-bold">clean, effective, and enjoyable</span> wellness in a shot.
           </p>
         </div>
       </div>

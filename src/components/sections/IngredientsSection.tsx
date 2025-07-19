@@ -1,7 +1,6 @@
 'use client'; // Needed for useState hook
 
 import React, { useState } from 'react';
-import Image from 'next/image'; // If using images for ingredients
 
 // Data based on PRD
 const ingredients = [
@@ -28,7 +27,7 @@ const IngredientsSection: React.FC = () => {
             Why It Works: Powerful Ingredients
           </h2>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Each shot is a synergistic blend of nature's finest, chosen for their proven wellness benefits. Hover over an ingredient to learn more.
+            Each shot is a synergistic blend of nature&apos;s finest, chosen for their proven wellness benefits. Hover over an ingredient to learn more.
           </p>
         </div>
 

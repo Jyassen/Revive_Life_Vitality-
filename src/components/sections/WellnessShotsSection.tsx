@@ -35,7 +35,7 @@ const WellnessShotsSection: React.FC = () => {
             Wellness Shots with all the Good Stuff, None of the Bad
           </h2>
           <p className="text-lg text-gray-700 mb-8">
-            We craft fresh pressed wellness shots from organic superfoods into a daily immunity boosting shot. It's a two ounce kick you need to be ready for anything!
+            We craft fresh pressed wellness shots from organic superfoods into a daily immunity boosting shot. It&apos;s a two ounce kick you need to be ready for anything!
           </p>
           <Button
             onClick={handleLearnMoreClick}

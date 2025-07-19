@@ -73,7 +73,7 @@ const ContactSection: React.FC = () => {
             Get in Touch
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Have questions about our products or want to learn more? We'd love to hear from you!
+            Have questions about our products or want to learn more? We&apos;d love to hear from you!
           </p>
         </div>
 
@@ -84,7 +84,7 @@ const ContactSection: React.FC = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
               <h3 className="text-2xl font-bold text-gray-800 mb-2">Thank You!</h3>
-              <p className="text-gray-600">Your message has been received. We'll get back to you soon!</p>
+              <p className="text-gray-600">Your message has been received. We&apos;ll get back to you soon!</p>
               <Button 
                 variant="secondary" 
                 size="md" 

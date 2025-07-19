@@ -21,7 +21,7 @@ const DailyRitualSection: React.FC = () => {
             
             <p className="text-gray-600 mb-6">
               Start your morning with Manuka Honey Immune Boost – on an
-              empty stomach or with your breakfast smoothie. It's like your daily
+              empty stomach or with your breakfast smoothie. It&apos;s like your daily
               wellness shot to kickstart immunity.
             </p>
             

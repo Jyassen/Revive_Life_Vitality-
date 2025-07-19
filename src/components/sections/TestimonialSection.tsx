@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
 
 type Testimonial = {
   id: string;
@@ -36,7 +35,7 @@ const TestimonialSection: React.FC = () => {
           <div className="text-center mb-12">
             <h2 className="section-title">Our Customers Love Us</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              Don't just take our word for it - see what real customers are saying about our wellness shots.
+              Don&apos;t just take our word for it - see what real customers are saying about our wellness shots.
             </p>
           </div>
           

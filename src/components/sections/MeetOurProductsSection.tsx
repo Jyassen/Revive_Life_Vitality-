@@ -24,7 +24,7 @@ const MeetOurProductsSection: React.FC = () => {
             Meet Our Cold-Pressed Juices, Wellness Shots & Functional Blends.
           </h2>
           <p className="text-lg text-gray-700 mb-8">
-            Each one hits more notes than Mariah and has more depth than your ex. It's just how we do things around here :)
+            Each one hits more notes than Mariah and has more depth than your ex. It&apos;s just how we do things around here :)
           </p>
           <Button
             onClick={handleShopAllClick}

@@ -128,7 +128,6 @@ const ProductSection: React.FC = () => {
               image={product.image}
               category={product.category}
               description={product.description}
-              benefits={product.benefits}
               onQuickView={openQuickView}
               onAddToCart={handleAddToCart}
             />

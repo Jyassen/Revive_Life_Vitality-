@@ -42,14 +42,14 @@ const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="bg-brand-dark text-white pt-16 pb-8">
+    <footer className="bg-gradient-to-t from-brand-dark to-gray-900 text-white pt-20 pb-8">
       <div className="container-custom">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-16">
           {/* Column 1: Brand & Newsletter */}
           <div>
-            <h3 className="text-xl font-medium mb-5">Revive Life</h3>
-            <p className="text-gray-300 text-sm mb-6">
-              Experience the power of nature with our organic wellness shots, crafted for optimal vitality.
+            <h3 className="text-2xl font-playfair font-normal mb-6 text-brand-cream">Revive Life Vitality</h3>
+            <p className="text-gray-300 mb-6 leading-relaxed">
+              Empowering your wellness journey with potent, organic shots that harness the power of nature, crafted for optimal vitality and peak performance.
             </p>
             <form onSubmit={handleSubmit} className="mt-4">
               <h4 className="text-sm font-medium mb-3">Join our newsletter</h4>

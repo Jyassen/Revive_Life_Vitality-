@@ -11,7 +11,6 @@ export type ProductCardProps = {
   image: string
   category: string
   description?: string
-  benefits?: string[]
   onQuickView?: (productId: string) => void
   onAddToCart?: (productId: string) => void
   className?: string
@@ -25,23 +24,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
   image,
   category,
   description,
-  benefits,
   onQuickView,
   onAddToCart,
   className = '',
   showActions = true
 }) => {
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    if (onAddToCart) onAddToCart(id)
-  }
-
-  const handleQuickView = (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    if (onQuickView) onQuickView(id)
-  }
 
   return (
     <div className={`product-card ${className}`}>

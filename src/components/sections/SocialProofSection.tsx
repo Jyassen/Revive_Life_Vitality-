@@ -41,7 +41,7 @@ const SocialProofSection: React.FC = () => {
             Loved by Wellness Enthusiasts
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Don't just take our word for it. See what real customers are saying.
+            Don&apos;t just take our word for it. See what real customers are saying.
           </p>
         </div>
 
@@ -60,7 +60,7 @@ const SocialProofSection: React.FC = () => {
                 />
               </div>
               <blockquote className="text-gray-700 italic mb-4 flex-grow">
-                <p>"{testimonial.quote}"</p>
+                <p>&quot;{testimonial.quote}&quot;</p>
               </blockquote>
               <footer className="mt-auto">
                  <p className="font-semibold text-brand-green-dark">{testimonial.name}</p>

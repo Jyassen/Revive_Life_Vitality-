@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Image from 'next/image';
 
 type PackageOption = {
@@ -48,10 +48,7 @@ const packageOptions: PackageOption[] = [
 ];
 
 const PurchaseOptionsSection: React.FC = () => {
-  const [selectedPackage, setSelectedPackage] = useState<string | null>(null);
-
   const handleAddToCart = (packageId: string) => {
-    setSelectedPackage(packageId);
     console.log(`Adding ${packageId} to cart`);
     // TODO: Implement actual cart functionality
   };

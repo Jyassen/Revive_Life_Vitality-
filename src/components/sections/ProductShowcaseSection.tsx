@@ -162,7 +162,7 @@ const ProductShowcaseSection: React.FC = () => {
         <div className="mt-20 pt-10 border-t border-gray-100">
           <div className="text-center mb-12">
             <h2 className="text-2xl md:text-3xl font-bold text-brand-dark mb-3">
-              More Products You'll Love
+              More Products You&apos;ll Love
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
               Discover our complete range of wellness shots for every need.

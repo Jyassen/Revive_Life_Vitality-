@@ -34,7 +34,7 @@ const FAQSection: React.FC = () => {
             Frequently Asked Questions
           </h2>
           <p className="text-lg text-gray-600">
-            Have questions? We've got answers.
+            Have questions? We&apos;ve got answers.
           </p>
         </div>
 

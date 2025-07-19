@@ -63,10 +63,9 @@ const IngredientSpotlightSection: React.FC = () => {
     const handleScroll = () => {
       if (!sectionRef.current) return;
       
-      const sectionTop = sectionRef.current.getBoundingClientRect().top;
       const scrollY = window.scrollY;
       
-      imageRefs.current.forEach((imageDiv, index) => {
+      imageRefs.current.forEach((imageDiv) => {
         if (!imageDiv) return;
         
         const rect = imageDiv.getBoundingClientRect();
@@ -97,7 +96,7 @@ const IngredientSpotlightSection: React.FC = () => {
       <div className="container-custom">
         <h2 className="text-4xl md:text-5xl font-medium text-center text-brand-dark mb-6">Powered by Organic Ingredients</h2>
         <p className="text-center text-gray-600 max-w-3xl mx-auto mb-12">
-          We believe in the power of real ingredients. Here's a look at the superfoods inside each Revive shot – and what they do for you.
+          We believe in the power of real ingredients. Here&apos;s a look at the superfoods inside each Revive shot – and what they do for you.
         </p>
 
         <div>

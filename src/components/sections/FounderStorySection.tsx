@@ -29,12 +29,12 @@ const FounderStorySection: React.FC = () => {
             </p>
             
             <blockquote className="border-l-4 border-brand-brown pl-4 italic mb-6">
-              <p className="text-brand-dark">"I created Revive to give people more than a quick fix—something real, effective, and grounded in both nature and evidence."</p>
+              <p className="text-brand-dark">&quot;I created Revive to give people more than a quick fix—something real, effective, and grounded in both nature and evidence.&quot;</p>
               <footer className="text-brand-brown mt-2">– Everyl A. McMorris, PA-C, Founder</footer>
             </blockquote>
             
             <p className="text-gray-600">
-              At Revive Life Vitality, Everyl's mission is simple yet powerful: To help you feel energized, resilient, and in control—using clean, potent ingredients that support your body's own healing potential.
+              At Revive Life Vitality, Everyl&apos;s mission is simple yet powerful: To help you feel energized, resilient, and in control—using clean, potent ingredients that support your body&apos;s own healing potential.
             </p>
           </div>
         </div>
