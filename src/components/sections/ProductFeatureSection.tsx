@@ -4,7 +4,6 @@ import React from 'react';
 import Image from 'next/image';
 
 type ProductFeatureProps = {
-  id: string;
   name: string;
   tagline: string;
   description: string;
@@ -14,7 +13,6 @@ type ProductFeatureProps = {
 };
 
 const ProductFeature: React.FC<ProductFeatureProps> = ({
-  id,
   name,
   tagline,
   description,
