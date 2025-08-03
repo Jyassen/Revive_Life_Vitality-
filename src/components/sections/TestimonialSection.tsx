@@ -13,14 +13,14 @@ type Testimonial = {
 const testimonials: Testimonial[] = [
   {
     id: 'testimonial-1',
-    text: `love how I feel after taking  Revive Life Vitality Shots. It gives my body energy and every shot is made with high quality fresh natural ingredients — you can actually taste the difference. Juggling a demanding career and family schedule can weigh me down but adding the daily shots to my routine keeps me going!`,
+    text: `love how I feel after taking  Revive Life Vitality Shots. It gives my body energy and every shot is made with high quality fresh natural ingredients - you can actually taste the difference. Juggling a demanding career and family schedule can weigh me down but adding the daily shots to my routine keeps me going!`,
     author: 'Nicole Johnson',
     role: 'News Reporter-WPIX-TV',
     avatar: '/images/testimonial-1.jpg',
   },
   {
     id: 'testimonial-2',
-    text: `I recently tried Revive Life's vitality wellness shots, and I couldn't be more impressed! Not only do these shots provide me with incredible energy and focus, but they're made with all-natural ingredients that I can trust. It's refreshing to find a product that aligns with my health goals and genuinely makes a difference in my daily routine. I highly recommend Revive Life to anyone who is serious about taking their health to the next level—this is a game-changer! 💪🏽`,
+    text: `I recently tried Revive Life's vitality wellness shots, and I couldn't be more impressed! Not only do these shots provide me with incredible energy and focus, but they're made with all-natural ingredients that I can trust. It's refreshing to find a product that aligns with my health goals and genuinely makes a difference in my daily routine. I highly recommend Revive Life to anyone who is serious about taking their health to the next level-this is a game-changer! 💪🏽`,
     author: 'Sean Ringgold',
     role: 'Actor',
     avatar: '/images/testimonial-2.jpg',

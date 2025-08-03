@@ -55,7 +55,7 @@ const comparisonFeatures: ComparisonFeature[] = [
 
 const ComparisonSection: React.FC = () => {
   return (
-    <section className="py-16 md:py-24 bg-white">
+    <section id="comparison" className="py-16 md:py-24 bg-white">
       <div className="container-custom">
         <div className="text-center mb-12">
           <h2 className="section-title mb-4">Why Revive Stands Out</h2>

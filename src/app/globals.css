@@ -11,6 +11,7 @@
   html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    scroll-padding-top: 120px; /* Account for fixed header height */
   }
   
   @media (prefers-reduced-motion: no-preference) {

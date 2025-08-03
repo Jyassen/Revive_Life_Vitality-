@@ -24,7 +24,11 @@ export const metadata: Metadata = {
   },
   description: "Experience the power of nature with our organic wellness shots, crafted for optimal vitality and wellbeing.",
   icons: {
-    icon: '/favicon.ico',
+    icon: [
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+    ],
+    apple: '/apple-touch-icon.png',
   }
 };
 

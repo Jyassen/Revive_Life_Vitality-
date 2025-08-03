@@ -9,6 +9,7 @@ import TestimonialSection from '@/components/sections/TestimonialSection';
 import ComparisonSection from '@/components/sections/ComparisonSection';
 import PurchaseOptionsSection from '@/components/sections/PurchaseOptionsSection';
 import ContactSection from '@/components/sections/ContactSection';
+import StickyCTA from '@/components/ui/StickyCTA';
 
 // Define metadata for the page (App Router convention)
 // This replaces the <Head> component for static metadata
@@ -52,13 +53,14 @@ const HomePage: React.FC = () => {
       <HeroSection />
       <ProductFeaturesSection />
       <DailyRitualSection />
+      <PurchaseOptionsSection />
       <HowToUseSection />
       <IngredientSpotlightSection />
       <FounderStorySection />
       <ComparisonSection />
       <TestimonialSection />
-      <PurchaseOptionsSection />
       <ContactSection />
+      <StickyCTA />
     </main>
   );
 };

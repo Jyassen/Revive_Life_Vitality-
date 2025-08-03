@@ -8,7 +8,7 @@ import { useCart } from '@/context/CartContext';
 const Header: React.FC = () => {
   // Navigation items
   const navItems = [
-    { name: 'Shop', href: '#shop' },
+    { name: 'Shop', href: '#purchase-options' },
     { name: 'About', href: '#about' },
     { name: 'Contact', href: '#contact' },
   ];
@@ -23,16 +23,16 @@ const Header: React.FC = () => {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-brand-beige/95 backdrop-blur-md border-b border-brand-cream/50">
       <div className="container-custom">
-        <div className="flex items-center justify-between py-4">
+        <div className="flex items-center justify-between py-1">
           {/* Logo */}
           <Link href="/" className="flex-shrink-0 hover:scale-105 transition-transform duration-200">
             <Image
-              src="/images/logo.png"
+              src="/images/logo.png?v=2"
               alt="Revive Life Vitality"
-              width={180}
-              height={72}
+              width={504}
+              height={202}
               priority
-              className="h-10 w-auto max-w-[140px] sm:h-12 sm:max-w-[160px] md:h-14 md:max-w-[180px] lg:h-16 lg:max-w-[200px]"
+              className="h-16 w-auto max-w-[280px] sm:h-18 sm:max-w-[320px] md:h-20 md:max-w-[360px] lg:h-24 lg:max-w-[400px]"
             />
           </Link>
 
@@ -50,14 +50,8 @@ const Header: React.FC = () => {
             ))}
           </nav>
 
-          {/* Icons: Account and Cart */}
+          {/* Cart Icon */}
           <div className="flex items-center space-x-6">
-            <Link href="/account" className="text-brand-dark hover:text-brand-brown transition-all duration-200 hover:scale-110">
-              <span className="sr-only">Account</span>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-              </svg>
-            </Link>
             <Link href="/cart" className="text-brand-dark hover:text-brand-brown transition-all duration-200 hover:scale-110 relative">
               <span className="sr-only">Cart</span>
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
