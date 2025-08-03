@@ -58,33 +58,35 @@ const LifestyleSection: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
-          <div className="bg-white p-8 rounded-lg shadow-sm">
-            <h3 className="text-xl font-medium text-brand-dark mb-4">Morning: Immunity</h3>
-            <p className="text-gray-600 mb-6">
+          <div className="bg-white p-6 rounded-lg shadow-sm flex flex-col">
+            <h3 className="text-xl font-medium text-brand-dark mb-3">Morning: Immunity</h3>
+            <p className="text-gray-600 mb-4 flex-shrink-0">
               Start your morning with <span className="font-medium">Manuka Honey Immune Boost</span> – on an empty stomach or with your breakfast smoothie. It&apos;s like your daily wellness shot to kickstart immunity.
             </p>
-            <div className="relative h-[250px] w-full">
+            <div className="relative w-full flex-grow">
               <Image
-                src="/images/lifestyle-morning.jpg" 
+                src="/images/morning-immunity-ritual.jpg"
                 alt="Morning immunity shot ritual"
-                fill
-                className="object-cover rounded-lg"
+                width={800}
+                height={500}
+                className="object-cover rounded-lg w-full h-full min-h-[280px]"
                 sizes="(max-width: 768px) 100vw, 50vw"
               />
             </div>
           </div>
 
-          <div className="bg-white p-8 rounded-lg shadow-sm">
-            <h3 className="text-xl font-medium text-brand-dark mb-4">Pre-workout or Afternoon: Energy</h3>
-            <p className="text-gray-600 mb-6">
+          <div className="bg-white p-6 rounded-lg shadow-sm flex flex-col">
+            <h3 className="text-xl font-medium text-brand-dark mb-3">Pre-workout or Afternoon: Energy</h3>
+            <p className="text-gray-600 mb-4 flex-shrink-0">
               Use <span className="font-medium">Red Beet Heat</span> 30 minutes before a workout or whenever you need an energy lift. Feel that natural rush of stamina without reaching for coffee or energy drinks.
             </p>
-            <div className="relative h-[250px] w-full">
+            <div className="relative w-full flex-grow">
               <Image
-                src="/images/lifestyle-workout.jpg" 
+                src="/images/pre-workout-energy-ritual.jpg"
                 alt="Pre-workout energy shot ritual"
-                fill
-                className="object-cover rounded-lg"
+                width={800}
+                height={500}
+                className="object-cover rounded-lg w-full h-full min-h-[280px]"
                 sizes="(max-width: 768px) 100vw, 50vw"
               />
             </div>

@@ -9,7 +9,6 @@ type ProductFeatureProps = {
   tagline: string;
   description: string;
   benefits: string[];
-  price: string;
   image: string;
   backgroundColor: string;
 };
@@ -20,65 +19,67 @@ const ProductFeature: React.FC<ProductFeatureProps> = ({
   tagline,
   description,
   benefits,
-  price,
   image,
   backgroundColor,
 }) => {
-  const handleAddToCart = () => {
-    console.log(`Adding ${id} to cart`);
-    // TODO: Implement actual cart functionality
-  };
 
-  const cardClassName = `h-full flex flex-col ${backgroundColor} rounded-2xl shadow-soft hover:shadow-xl transition-all duration-300 p-6 lg:p-8 group`;
+  const cardClassName = `h-full flex flex-col ${backgroundColor} rounded-2xl shadow-soft hover:shadow-xl transition-all duration-300 p-4 lg:p-6 group`;
 
   return (
     <div className="w-full flex-1 p-4">
       <div className={cardClassName}>
-        {/* Top Section: Image and Product Info */}
-        <div className="flex flex-col lg:flex-row mb-6">
+        {/* Header Section */}
+        <div className="mb-4">
+          <h2 className="text-xl md:text-2xl font-playfair font-normal text-brand-dark mb-2 leading-tight">{tagline}</h2>
+          <h3 className="text-base md:text-lg text-brand-brown mb-3 font-medium">{name}</h3>
+        </div>
+
+        {/* Image and Text Layout */}
+        <div className="mb-4 overflow-hidden">
           {/* Product Image */}
-          <div className="relative h-[280px] lg:h-[400px] lg:w-1/2 flex items-center justify-center mb-6 lg:mb-0 lg:mr-8">
-            <div className="absolute inset-0 bg-gradient-to-r from-brand-brown/5 to-brand-green/5 rounded-xl transform group-hover:scale-105 transition-transform duration-300"></div>
+          <div className="relative h-[260px] w-full lg:w-[320px] lg:h-[260px] float-left mr-6 mb-4">
             <Image
               src={image}
               alt={name}
-              width={220}
-              height={350}
-              className="object-contain relative z-10 group-hover:scale-105 transition-transform duration-300"
+              fill
+              className="object-cover rounded-xl relative z-10 group-hover:scale-105 transition-transform duration-300"
+              sizes="(max-width: 768px) 100vw, 320px"
             />
           </div>
 
-          {/* Product Info */}
-          <div className="lg:w-1/2 flex flex-col">
-            <div className="flex-grow">
-              <h2 className="text-2xl md:text-3xl font-playfair font-normal text-brand-dark mb-3 leading-tight">{tagline}</h2>
-              <h3 className="text-lg md:text-xl text-brand-brown mb-4 font-medium">{name}</h3>
-              <p className="text-gray-700 mb-8 text-sm md:text-base leading-relaxed">{description}</p>
-            </div>
-            
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4 pt-6 border-t border-gray-200 mt-auto">
-              <span className="text-2xl font-bold text-brand-dark">{price}</span>
-              <button 
-                onClick={handleAddToCart}
-                className="btn-primary flex-1 sm:flex-none whitespace-nowrap"
-                aria-label={`Add ${name} to cart`}
-              >
-                Add to Cart
-              </button>
-            </div>
+          {/* Product Description wrapping around image */}
+          <div className="text-gray-700 text-sm md:text-base leading-relaxed">
+            <p>{description}</p>
+          </div>
+          
+          {/* Clear float and add button */}
+          <div className="clear-both pt-4">
+            <a 
+              href="#purchase-options"
+              className="btn-primary inline-block text-center px-6 py-3 text-sm font-medium"
+              aria-label={`Get ${name} now`}
+            >
+              Shop Now
+            </a>
           </div>
         </div>
 
         {/* Key Benefits Section - Full Width */}
         <div className="w-full">
-          <h4 className="font-medium text-brand-dark mb-6 text-lg">Key Benefits:</h4>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <h4 className="font-medium text-brand-dark mb-3 text-base">Key Benefits:</h4>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {benefits.map((benefit, index) => {
               const [title, description] = benefit.includes(':') ? benefit.split(': ') : [benefit, ''];
               let icon;
               
               // Choose icon based on benefit type
-              if (title.toLowerCase().includes('energy') || title.toLowerCase().includes('stamina')) {
+              if (title.toLowerCase().includes('clean energy')) {
+                icon = (
+                  <svg className="w-6 h-6 text-brand-brown" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                );
+              } else if (title.toLowerCase().includes('energy') || title.toLowerCase().includes('stamina')) {
                 icon = (
                   <svg className="w-6 h-6 text-brand-brown" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -105,13 +106,13 @@ const ProductFeature: React.FC<ProductFeatureProps> = ({
               } else if (title.toLowerCase().includes('gut') || title.toLowerCase().includes('throat') || title.toLowerCase().includes('sooth')) {
                 icon = (
                   <svg className="w-6 h-6 text-brand-brown" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.5a3.5 3.5 0 110 7H9V10z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v2M12 19v2M8 7h8a2 2 0 012 2v0a2 2 0 01-2 2H6a2 2 0 00-2 2v0a2 2 0 002 2h8a2 2 0 012 2v0a2 2 0 01-2 2H8" />
                   </svg>
                 );
               } else if (title.toLowerCase().includes('clean') || title.toLowerCase().includes('natural')) {
                 icon = (
                   <svg className="w-6 h-6 text-brand-brown" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 2L8 6h3v9l-3-3M12 2l4 4h-3v9l3-3M9 21h6" />
                   </svg>
                 );
               } else {
@@ -124,12 +125,12 @@ const ProductFeature: React.FC<ProductFeatureProps> = ({
               }
               
               return (
-                <div key={index} className="flex items-start space-x-3">
+                <div key={index} className="flex items-start space-x-2">
                   <div className="flex-shrink-0 mt-1">
                     {icon}
                   </div>
                   <div>
-                    <h5 className="font-medium text-brand-dark text-sm mb-1">{title}</h5>
+                    <h5 className="font-medium text-brand-dark text-sm mb-0.5">{title}</h5>
                     {description && (
                       <p className="text-gray-600 text-xs leading-relaxed">{description}</p>
                     )}
@@ -162,14 +163,13 @@ export const ProductFeaturesSection: React.FC = () => {
             id="red-beet-heat"
             name="Red Beet Heat – Energizing Wellness Shot"
             tagline="Naturally Fire Up Your Energy"
-            description="Meet Red Beet Heat – a 2oz powerhouse that gives you a natural pre-workout kick. This ruby-red shot blends organic beets, ginger, and a dash of cayenne for a spicy kick. Formulated to boost circulation and metabolism, it's perfect for an afternoon slump or a gym session. No jitters, no crash – just plant-powered vitality. Earthy-sweet with a zesty bite, you'll feel the invigorating kick in minutes."
+            description="Meet Red Beet Heat – a 2oz powerhouse that gives you a natural pre-workout kick. This nutritious red shot blends organic beets, ginger, and a dash of cayenne for a spicy kick. Formulated to boost circulation and metabolism, it's perfect for an afternoon slump or a gym session. No jitters, no crash – just plant-powered vitality. Earthy-sweet with a zesty bite, you'll feel the invigorating kick in minutes."
             benefits={[
               "Energy & Stamina: Increases blood flow for improved endurance (thanks to nitrate-rich beets)",
               "Metabolism Boost: Naturally boosts metabolism with cayenne & ginger for calorie burn",
               "Post-Workout Recovery: Fights inflammation with turmeric and antioxidants, aiding recovery"
             ]}
-            price="$4.99"
-            image="/images/site pics/Red Beet Heat Finished.png"
+            image="/images/Red Beet Heat Nice.png"
             backgroundColor="bg-white"
           />
           <ProductFeature
@@ -182,8 +182,7 @@ export const ProductFeaturesSection: React.FC = () => {
               "Gut & Throat Soothing: Soothes the gut and throat – ginger and honey calm digestion and irritation",
               "Clean Energy: Natural energy and focus from B-vitamins in wheatgrass and vitamin C in lemon, without caffeine"
             ]}
-            price="$4.99"
-            image="/images/site pics/Manuka Honey Finished.png"
+            image="/images/Manuka Honey Nice.png"
             backgroundColor="bg-brand-beige"
           />
         </div>
@@ -202,14 +201,13 @@ export const RedBeetHeatFeature: React.FC = () => {
             id="red-beet-heat"
             name="Red Beet Heat – Energizing Wellness Shot"
             tagline="Naturally Fire Up Your Energy"
-            description="Meet Red Beet Heat – a 2oz powerhouse that gives you a natural pre-workout kick. This ruby-red shot blends organic beets, ginger, and a dash of cayenne for a spicy kick. Formulated to boost circulation and metabolism, it's perfect for an afternoon slump or a gym session. No jitters, no crash – just plant-powered vitality. Earthy-sweet with a zesty bite, you'll feel the invigorating kick in minutes."
+            description="Meet Red Beet Heat – a 2oz powerhouse that gives you a natural pre-workout kick. This nutritious red shot blends organic beets, ginger, and a dash of cayenne for a spicy kick. Formulated to boost circulation and metabolism, it's perfect for an afternoon slump or a gym session. No jitters, no crash – just plant-powered vitality. Earthy-sweet with a zesty bite, you'll feel the invigorating kick in minutes."
             benefits={[
               "Energy & Stamina: Increases blood flow for improved endurance (thanks to nitrate-rich beets)",
               "Metabolism Boost: Naturally boosts metabolism with cayenne & ginger for calorie burn",
               "Post-Workout Recovery: Fights inflammation with turmeric and antioxidants, aiding recovery"
             ]}
-            price="$4.99"
-            image="/images/site pics/Red Beet Heat Finished.png"
+            image="/images/Red Beet Heat Nice.png"
             backgroundColor="bg-white"
           />
         </div>
@@ -233,8 +231,7 @@ export const ManukaHoneyFeature: React.FC = () => {
               "Gut & Throat Soothing: Soothes the gut and throat – ginger and honey calm digestion and irritation",
               "Clean Energy: Natural energy and focus from B-vitamins in wheatgrass and vitamin C in lemon, without caffeine"
             ]}
-            price="$4.99"
-            image="/images/site pics/Manuka Honey Finished.png"
+            image="/images/Manuka Honey Nice.png"
             backgroundColor="bg-brand-beige"
           />
         </div>

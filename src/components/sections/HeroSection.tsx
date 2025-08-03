@@ -11,12 +11,22 @@ const HeroSection: React.FC = () => {
   };
   
   const handleShopNowClick = () => {
-    // Find the shop section and scroll to it
-    const shopSection = document.getElementById('shop');
-    if (shopSection) {
-      shopSection.scrollIntoView({ behavior: 'smooth' });
+    // Find the purchase options section and scroll to it
+    const purchaseSection = document.getElementById('purchase-options');
+    if (purchaseSection) {
+      purchaseSection.scrollIntoView({ behavior: 'smooth' });
     } else {
-      console.warn('Shop section (#shop) not found for scrolling.');
+      console.warn('Purchase options section (#purchase-options) not found for scrolling.');
+    }
+  };
+
+  const handleLearnMoreClick = () => {
+    // Find the comparison section and scroll to it
+    const comparisonSection = document.getElementById('comparison');
+    if (comparisonSection) {
+      comparisonSection.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      console.warn('Comparison section (#comparison) not found for scrolling.');
     }
   };
 
@@ -49,7 +59,7 @@ const HeroSection: React.FC = () => {
                 Small Shots,<br /><span className="text-brand-brown">Big Vitality</span>
               </h1>
               <p className="text-gray-700 mb-10 max-w-lg text-base md:text-lg leading-relaxed">
-                Two potent 2oz shots — crafted by nutritionists from organic superfoods — to energize your body and fortify your immunity. All organic. Zero junk. Real results.
+                Two potent 2oz shots - crafted by nutritionists from organic superfoods - to energize your body and fortify your immunity. All organic. Zero junk. Real results.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 mb-12">
                 <button 
@@ -59,7 +69,11 @@ const HeroSection: React.FC = () => {
                 >
                   Shop Now
                 </button>
-                <button className="btn-outline px-8 py-4 text-base hover:scale-105 transform transition-all duration-200">
+                <button 
+                  onClick={handleLearnMoreClick}
+                  className="btn-outline px-8 py-4 text-base hover:scale-105 transform transition-all duration-200"
+                  aria-label="Learn more about why Revive stands out"
+                >
                   Learn More
                 </button>
               </div>
@@ -111,7 +125,7 @@ const HeroSection: React.FC = () => {
             <div className="relative flex justify-center items-center lg:justify-end animate-slide-up">
               <div className="relative h-[600px] w-full max-w-xl mx-auto lg:mr-0">
                 <Image
-                  src="/images/hero.png"
+                  src="/images/Hero_Final.png"
                   alt="Revive Life Vitality wellness shot bottles"
                   fill
                   priority

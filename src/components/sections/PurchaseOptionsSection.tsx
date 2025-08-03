@@ -19,31 +19,29 @@ const packageOptions: PackageOption[] = [
   {
     id: 'starter-pack',
     title: 'Starter Pack',
-    description: 'Great for first-timers: try both flavors!',
+    description: 'Perfect for trying our wellness shots!',
     price: '$19.99',
-    image: '/images/package-starter.png',
-    features: ['Includes 2 Red Beet Heat + 2 Manuka Honey Immune Boost', 'Easy introduction to our products', 'One-time purchase']
+    image: '/images/Starter Pack.png',
+    features: ['3 juice shots', '$10 delivery fee', 'One-time purchase', 'Great for first-time customers']
   },
   {
-    id: 'one-week',
-    title: '7-Day Wellness Pack',
-    description: 'One full week of daily shots to feel the difference.',
-    price: '$34.99',
-    originalPrice: '$41.99',
-    savings: 'Save 15%',
+    id: 'pro-pack',
+    title: 'Pro Pack',
+    description: 'Get more value with our popular pro option.',
+    price: '$39.99',
     isRecommended: true,
-    image: '/images/package-weekly.png',
-    features: ['7 shots total (customize any mix)', 'Free shipping', 'One-time purchase', 'Experience real results']
+    image: '/images/Pro Pack.png',
+    features: ['7 juice shots', '$10 delivery fee', 'One-time purchase', 'Best value for regular customers']
   },
   {
-    id: 'monthly',
-    title: 'Monthly Subscription',
-    description: 'Your daily wellness, delivered monthly. Set it and forget it!',
-    price: '$99/month',
-    originalPrice: '$129.99',
-    savings: 'Save 25%',
-    image: '/images/package-monthly.png',
-    features: ['30 shots monthly (customize your mix)', 'Best value at ~$3.30/shot', 'Free priority shipping', 'Skip or cancel anytime']
+    id: 'revive-club',
+    title: 'Revive Club',
+    description: 'Weekly subscription with exclusive savings!',
+    price: '$35.99/week',
+    originalPrice: '$39.99',
+    savings: 'Save 10%',
+    image: '/images/Revive club.png',
+    features: ['7 juice shots weekly', '10% off Pro Pack price', '$10 delivery fee', 'Cancel anytime']
   }
 ];
 
@@ -54,12 +52,12 @@ const PurchaseOptionsSection: React.FC = () => {
   };
 
   return (
-    <section id="shop" className="py-16 md:py-24 bg-brand-beige">
+    <section id="purchase-options" className="py-16 md:py-24 bg-brand-beige">
       <div className="container-custom">
         <div className="text-center mb-12">
           <h2 className="section-title mb-4">Get Revived – Choose Your Package</h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Select the package that fits your wellness journey. All packages include our premium organic wellness shots with free shipping on orders over $30.
+            Select the package that fits your wellness journey. All packages include our premium organic wellness shots with $10 delivery fee.
           </p>
         </div>
 
@@ -67,7 +65,8 @@ const PurchaseOptionsSection: React.FC = () => {
           {packageOptions.map((pkg) => (
             <div 
               key={pkg.id} 
-              className={`bg-white rounded-lg shadow-sm overflow-hidden transition-all duration-300 ${
+              className={`bg-white rounded-lg shadow-sm overflow-hidden transition-all duration-300 flex flex-col ${
+                pkg.id === 'revive-club' ? 'ring-2 ring-yellow-400 shadow-yellow-200/50 relative transform hover:-translate-y-1' :
                 pkg.isRecommended ? 'ring-2 ring-brand-brown relative transform hover:-translate-y-1' : 'hover:shadow-md hover:-translate-y-1'
               }`}
             >
@@ -76,8 +75,13 @@ const PurchaseOptionsSection: React.FC = () => {
                   Best Value
                 </div>
               )}
+              {pkg.id === 'revive-club' && (
+                <div className="absolute top-0 right-0 bg-gradient-to-r from-yellow-400 to-yellow-600 text-white text-xs font-bold px-3 py-1 uppercase tracking-wider">
+                  Premium
+                </div>
+              )}
               
-              <div className="p-6">
+              <div className="p-6 flex flex-col flex-grow">
                 <div className="h-48 relative mb-6">
                   <Image
                     src={pkg.image}
@@ -101,7 +105,7 @@ const PurchaseOptionsSection: React.FC = () => {
                 </div>
                 
                 {pkg.features && (
-                  <ul className="mb-6 space-y-2">
+                  <ul className="mb-6 space-y-2 flex-grow">
                     {pkg.features.map((feature, index) => (
                       <li key={index} className="flex items-start">
                         <svg className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -116,12 +120,12 @@ const PurchaseOptionsSection: React.FC = () => {
                 <button
                   onClick={() => handleAddToCart(pkg.id)}
                   className={`w-full py-3 px-4 rounded-md font-medium text-center ${
-                    pkg.id === 'monthly' 
+                    pkg.id === 'revive-club' 
                       ? 'bg-brand-brown text-white hover:bg-brand-brown/90'
                       : 'bg-brand-dark text-white hover:bg-brand-dark/90'
                   }`}
                 >
-                  {pkg.id === 'monthly' ? 'Subscribe & Save' : 'Add to Cart'}
+                  {pkg.id === 'revive-club' ? 'Subscribe & Save' : 'Add to Cart'}
                 </button>
               </div>
             </div>
@@ -140,12 +144,6 @@ const PurchaseOptionsSection: React.FC = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
             </svg>
             <span className="text-sm text-gray-600">Credit Cards & PayPal</span>
-          </div>
-          <div className="flex items-center">
-            <svg className="h-6 w-6 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-            </svg>
-            <span className="text-sm text-gray-600">100% Money-back Guarantee</span>
           </div>
         </div>
       </div>
