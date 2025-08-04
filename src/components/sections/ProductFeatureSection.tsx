@@ -158,7 +158,6 @@ export const ProductFeaturesSection: React.FC = () => {
         </div>
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
           <ProductFeature
-            id="red-beet-heat"
             name="Red Beet Heat – Energizing Wellness Shot"
             tagline="Naturally Fire Up Your Energy"
             description="Meet Red Beet Heat – a 2oz powerhouse that gives you a natural pre-workout kick. This nutritious red shot blends organic beets, ginger, and a dash of cayenne for a spicy kick. Formulated to boost circulation and metabolism, it's perfect for an afternoon slump or a gym session. No jitters, no crash – just plant-powered vitality. Earthy-sweet with a zesty bite, you'll feel the invigorating kick in minutes."
@@ -171,7 +170,6 @@ export const ProductFeaturesSection: React.FC = () => {
             backgroundColor="bg-white"
           />
           <ProductFeature
-            id="manuka-honey"
             name="Manuka Honey Immune Boost – Immune Support Shot"
             tagline="Your Daily Immunity Shield"
             description="Manuka Honey Immune Boost is your delicious daily defense. Made with genuine Manuka honey, revered for its natural antibacterial power, plus golden beets, turmeric and wheatgrass. This golden shot fortifies your immune system and reduces inflammation, helping you stay healthy year-round. Slightly sweet and soothing, with a zing of ginger – it's the tasty way to get your antioxidants and vitamins."
@@ -196,7 +194,6 @@ export const RedBeetHeatFeature: React.FC = () => {
       <div className="container-custom">
         <div className="flex flex-wrap -mx-4">
           <ProductFeature
-            id="red-beet-heat"
             name="Red Beet Heat – Energizing Wellness Shot"
             tagline="Naturally Fire Up Your Energy"
             description="Meet Red Beet Heat – a 2oz powerhouse that gives you a natural pre-workout kick. This nutritious red shot blends organic beets, ginger, and a dash of cayenne for a spicy kick. Formulated to boost circulation and metabolism, it's perfect for an afternoon slump or a gym session. No jitters, no crash – just plant-powered vitality. Earthy-sweet with a zesty bite, you'll feel the invigorating kick in minutes."
@@ -220,7 +217,6 @@ export const ManukaHoneyFeature: React.FC = () => {
       <div className="container-custom">
         <div className="flex flex-wrap -mx-4">
           <ProductFeature
-            id="manuka-honey"
             name="Manuka Honey Immune Boost – Immune Support Shot"
             tagline="Your Daily Immunity Shield"
             description="Manuka Honey Immune Boost is your delicious daily defense. Made with genuine Manuka honey, revered for its natural antibacterial power, plus golden beets, turmeric and wheatgrass. This golden shot fortifies your immune system and reduces inflammation, helping you stay healthy year-round. Slightly sweet and soothing, with a zing of ginger – it's the tasty way to get your antioxidants and vitamins."
