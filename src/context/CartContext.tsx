@@ -2,6 +2,8 @@
 
 import React, { createContext, useContext, useReducer, ReactNode } from 'react'
 
+import type { PackageConfig } from '@/types/package'
+
 // Cart item interface
 export interface CartItem {
 	id: string
@@ -10,6 +12,7 @@ export interface CartItem {
 	image: string
 	quantity: number
 	category?: string
+	packageConfig?: PackageConfig
 }
 
 // Cart state interface

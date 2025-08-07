@@ -4,11 +4,14 @@ import React from 'react';
 import Image from 'next/image';
 import Button from '@/components/ui/Button'; // Updated path alias
 import ProductCard from '@/components/ui/ProductCard';
+import { useCart } from '@/context/CartContext';
 
 const products = [
   {
     id: 'red-beet-heat',
     name: 'Red Beet Heat',
+    price: '$12.99',
+    category: 'Energy',
     image: '/images/site pics/Red Beet Heat Finished.png',
     description: 'A bold, energizing blend featuring Red Beets, Turmeric, Ginger, Mint, Wheatgrass, Cayenne Pepper, and Lemon Juice. Designed to rev up circulation and metabolism.',
     benefits: [
@@ -24,6 +27,8 @@ const products = [
   {
     id: 'vitality-boost',
     name: 'Vitality Boost',
+    price: '$13.99',
+    category: 'Wellness',
     image: '/images/product-vitality.png',
     description: 'A revitalizing blend of leafy greens, adaptogens, and essential nutrients designed to enhance your natural energy levels and promote overall wellness.',
     benefits: [
@@ -39,6 +44,8 @@ const products = [
   {
     id: 'manuka-honey-immune',
     name: 'Manuka Honey Immune Boost',
+    price: '$14.99',
+    category: 'Immunity',
     image: '/images/site pics/Manuka Honey Finished.png',
     description: 'A nurturing, golden blend featuring Manuka Honey, Golden Beets, Turmeric, Ginger, Mint, Wheatgrass, and Lemon Juice. Formulated to fortify the immune system.',
     benefits: [
@@ -82,16 +89,21 @@ const additionalProducts = [
 ];
 
 const ProductShowcaseSection: React.FC = () => {
+  const { addItem } = useCart();
+
   const handleAddToCart = (productId: string) => {
-    console.log(`Add to cart clicked for ${productId}`);
-    // TODO: Add logic to actually add to cart (e.g., update state, call API)
-    // Scroll to shop/checkout section?
-     const shopSection = document.getElementById('shop');
-    if (shopSection) {
-      // Use block: 'nearest' to avoid scrolling too far if section is already visible
-      shopSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    } else {
-        console.warn('Shop section (#shop) not found for scrolling.');
+    // Find product in either the main products array or additional products
+    const product = products.find(p => p.id === productId) || 
+                   additionalProducts.find(p => p.id === productId);
+    
+    if (product) {
+      addItem({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.image,
+        category: product.category
+      });
     }
   };
 

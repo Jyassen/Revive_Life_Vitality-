@@ -3,6 +3,7 @@
 import React from 'react'
 import Image from 'next/image'
 import Button from '@/components/ui/Button'
+import { useCart } from '@/context/CartContext'
 
 export type ProductCardProps = {
   id: string
@@ -29,6 +30,20 @@ const ProductCard: React.FC<ProductCardProps> = ({
   className = '',
   showActions = true
 }) => {
+  const { addItem } = useCart()
+  
+  const handleAddToCart = () => {
+    addItem({
+      id,
+      name,
+      price,
+      image,
+      category
+    })
+    if (onAddToCart) {
+      onAddToCart(id)
+    }
+  }
 
   return (
     <div className={`product-card ${className}`}>
@@ -48,7 +63,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 className="mb-2" 
                 variant="primary"
                 size="sm"
-                onClick={() => onAddToCart && onAddToCart(id)}
+                onClick={handleAddToCart}
                 ariaLabel={`Add ${name} to cart`}
               >
                 Add to Cart

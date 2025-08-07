@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# system prompts
+Backend Developer System prompt.md
+
+# claude code guides
+Claude Code Sub-Agents Guide.md

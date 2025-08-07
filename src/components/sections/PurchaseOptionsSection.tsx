@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 type PackageOption = {
   id: string;
@@ -29,7 +30,6 @@ const packageOptions: PackageOption[] = [
     title: 'Pro Pack',
     description: 'Get more value with our popular pro option.',
     price: '$39.99',
-    isRecommended: true,
     image: '/images/Pro Pack.png',
     features: ['7 juice shots', '$10 delivery fee', 'One-time purchase', 'Best value for regular customers']
   },
@@ -40,15 +40,17 @@ const packageOptions: PackageOption[] = [
     price: '$35.99/week',
     originalPrice: '$39.99',
     savings: 'Save 10%',
+    isRecommended: true,
     image: '/images/Revive club.png',
     features: ['7 juice shots weekly', '10% off Pro Pack price', '$10 delivery fee', 'Cancel anytime']
   }
 ];
 
 const PurchaseOptionsSection: React.FC = () => {
-  const handleAddToCart = (packageId: string) => {
-    console.log(`Adding ${packageId} to cart`);
-    // TODO: Implement actual cart functionality
+  const router = useRouter();
+
+  const handleConfigurePackage = (packageId: string) => {
+    router.push(`/configure/${packageId}`);
   };
 
   return (
@@ -66,18 +68,12 @@ const PurchaseOptionsSection: React.FC = () => {
             <div 
               key={pkg.id} 
               className={`bg-white rounded-lg shadow-sm overflow-hidden transition-all duration-300 flex flex-col ${
-                pkg.id === 'revive-club' ? 'ring-2 ring-yellow-400 shadow-yellow-200/50 relative transform hover:-translate-y-1' :
-                pkg.isRecommended ? 'ring-2 ring-brand-brown relative transform hover:-translate-y-1' : 'hover:shadow-md hover:-translate-y-1'
+                pkg.isRecommended ? 'ring-2 ring-yellow-400 shadow-yellow-200/50 relative transform hover:-translate-y-1' : 'hover:shadow-md hover:-translate-y-1'
               }`}
             >
               {pkg.isRecommended && (
-                <div className="absolute top-0 right-0 bg-brand-brown text-white text-xs font-bold px-3 py-1 uppercase tracking-wider">
-                  Best Value
-                </div>
-              )}
-              {pkg.id === 'revive-club' && (
                 <div className="absolute top-0 right-0 bg-gradient-to-r from-yellow-400 to-yellow-600 text-white text-xs font-bold px-3 py-1 uppercase tracking-wider">
-                  Premium
+                  Best Value
                 </div>
               )}
               
@@ -118,14 +114,14 @@ const PurchaseOptionsSection: React.FC = () => {
                 )}
                 
                 <button
-                  onClick={() => handleAddToCart(pkg.id)}
-                  className={`w-full py-3 px-4 rounded-md font-medium text-center ${
+                  onClick={() => handleConfigurePackage(pkg.id)}
+                  className={`w-full py-3 px-4 rounded-md font-medium text-center transition-colors duration-200 ${
                     pkg.id === 'revive-club' 
                       ? 'bg-brand-brown text-white hover:bg-brand-brown/90'
                       : 'bg-brand-dark text-white hover:bg-brand-dark/90'
                   }`}
                 >
-                  {pkg.id === 'revive-club' ? 'Subscribe & Save' : 'Add to Cart'}
+                  {pkg.id === 'revive-club' ? 'Configure Subscription' : 'Configure Package'}
                 </button>
               </div>
             </div>

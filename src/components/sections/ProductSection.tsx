@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import ProductCard from '@/components/ui/ProductCard';
+import { useCart } from '@/context/CartContext';
 
 type Product = {
   id: string;
@@ -69,6 +70,7 @@ const ProductSection: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState('All');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { addItem } = useCart();
   
   const filteredProducts = activeCategory === 'All' 
     ? products 
@@ -85,8 +87,16 @@ const ProductSection: React.FC = () => {
   };
 
   const handleAddToCart = (productId: string) => {
-    console.log(`Adding product to cart: ${productId}`);
-    // TODO: Implement actual cart functionality
+    const product = products.find(p => p.id === productId);
+    if (product) {
+      addItem({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.image,
+        category: product.category
+      });
+    }
   };
   
   const closeModal = () => {
@@ -198,7 +208,11 @@ const ProductSection: React.FC = () => {
                     <span className="px-4 py-2">1</span>
                     <button className="px-3 py-2 border-l border-gray-300">+</button>
                   </div>
-                  <button className="btn-primary flex-grow">
+                  <button 
+                    className="btn-primary flex-grow"
+                    onClick={() => handleAddToCart(selectedProduct.id)}
+                    aria-label={`Add ${selectedProduct.name} to cart`}
+                  >
                     Add to Cart
                   </button>
                 </div>

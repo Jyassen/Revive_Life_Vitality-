@@ -1,0 +1,641 @@
+
+> revive_life_vitality@0.1.0 dev
+> next dev --turbopack
+
+   ▲ Next.js 15.3.0 (Turbopack)
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.1.219:3000
+
+ ✓ Starting...
+ ✓ Ready in 2.4s
+ ○ Compiling / ...
+ ✓ Compiled / in 16.6s
+ ⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ GET / 200 in 22248ms
+ ○ Compiling /favicon.ico ...
+ ✓ Compiled /favicon.ico in 13.9s
+ GET /favicon.ico?favicon.cc50ab60.ico 200 in 16728ms
+ ○ Compiling /configure/[packageId] ...
+ ✓ Compiled /configure/[packageId] in 5.1s
+ GET /configure/starter-pack 200 in 8337ms
+ GET /configure/pro-pack 200 in 1275ms
+ GET /configure/starter-pack 200 in 563ms
+ GET /configure/starter-pack 200 in 533ms
+ GET /configure/starter-pack 200 in 167ms
+ GET /configure/starter-pack 200 in 221ms
+ GET /configure/revive-club 200 in 520ms
+ GET /configure/pro-pack 200 in 309ms
+ ○ Compiling /cart ...
+ ✓ Compiled /cart in 3.4s
+ GET /cart 200 in 3528ms
+ GET /favicon.ico?favicon.cc50ab60.ico 200 in 406ms
+ ○ Compiling /checkout ...
+ ✓ Compiled /checkout in 3.4s
+ GET /checkout 200 in 3574ms
+ GET /checkout 200 in 297ms
+ GET /checkout 200 in 163ms
+ GET /checkout 200 in 134ms
+ GET /checkout 200 in 121ms
+ GET / 200 in 1817ms
+ GET /configure/revive-club 200 in 392ms
+ ✓ Compiled in 6.4s
+ ✓ Compiled in 1497ms
+ GET /configure/pro-pack 200 in 329ms
+ ✓ Compiled in 7.9s
+ ✓ Compiled in 1103ms
+ GET /configure/starter-pack 200 in 795ms
+ GET /cart 200 in 322ms
+ GET /checkout 200 in 197ms
+ ⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ GET / 200 in 1912ms
+ ✓ Compiled in 5.5s
+ ✓ Compiled in 16.5s
+ ✓ Compiled in 0ms
+ ⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ GET / 200 in 26836ms
+ GET / 200 in 28985ms
+ ⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ GET /favicon.ico?favicon.cc50ab60.ico 200 in 1916ms
+ ✓ Compiled in 4s
+ ✓ Compiled /configure/[packageId] in 246ms
+ GET /configure/starter-pack 200 in 1486ms
+ ✓ Compiled /cart in 166ms
+ GET /cart 200 in 587ms
+ GET / 200 in 307ms
+ ✓ Compiled in 6.6s
+ ✓ Compiled in 1276ms
+ ✓ Compiled in 1348ms
+ ✓ Compiled in 6.8s
+ ✓ Compiled / in 457ms
+ ⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ GET / 200 in 7804ms
+ GET / 200 in 543ms
+ GET / 200 in 2603ms
+ GET / 200 in 2902ms
+ ✓ Compiled /cart in 201ms
+ GET /cart 200 in 414ms
+ ✓ Compiled in 1283ms
+ ✓ Compiled in 1393ms
+ ✓ Compiled in 854ms
+ ✓ Compiled in 1469ms
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/server/app/cart/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/server/app/cart/page/app-build-manifest.json'
+}
+ ○ Compiling /_error ...
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/server/app/cart/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/server/app/cart/page/app-build-manifest.json'
+}
+ ✓ Compiled /_error in 26.3s
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.5v6k3kcoi4g'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.5v6k3kcoi4g'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.zrb53plishd'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.zrb53plishd'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.bmi8wj8n12s'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.bmi8wj8n12s'
+}
+[Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/server/app/cart/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/server/app/cart/page/app-build-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/server/app/cart/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/server/app/cart/page/app-build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.p6e3qd3qe39'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.p6e3qd3qe39'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.yyvc0ap2'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.yyvc0ap2'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.ja0noetvll'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.ja0noetvll'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.9k72146xcn7'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.9k72146xcn7'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.erfqp4vnwzr'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.erfqp4vnwzr'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.9pxinfbqd7g'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.9pxinfbqd7g'
+}
+[Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.ggkvvguha5t'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.ggkvvguha5t'
+}
+[Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.xrbdvf9dmpk'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.xrbdvf9dmpk'
+}
+[Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.1q6kc2vf713'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.1q6kc2vf713'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.g4652ict4wo'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.g4652ict4wo'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.yieuhxpn0s'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.yieuhxpn0s'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.5yrkuju3jj4'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.5yrkuju3jj4'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.g05xf87i2e'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.g05xf87i2e'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.hs89vbr0lrp'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.hs89vbr0lrp'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.g9zg1ts786f'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.g9zg1ts786f'
+}
+[Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.r22whh41bd'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.r22whh41bd'
+}
+[Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.4btc4ivm4oj'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.4btc4ivm4oj'
+}
+[Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.nyqk0axwsjm'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.nyqk0axwsjm'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/server/app/cart/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/server/app/cart/page/app-build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/server/app/cart/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/server/app/cart/page/app-build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.mxcj6z537k'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.mxcj6z537k'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.jpfj06ftv2'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.jpfj06ftv2'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.het7497adv'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.het7497adv'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.bmpedvgnnfv'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.bmpedvgnnfv'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.0ti54vsq9148'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.0ti54vsq9148'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.gzgipb6h33'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.gzgipb6h33'
+}
+[Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.yw0nxvpfxqd'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.yw0nxvpfxqd'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.grcrvyfuh45'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.grcrvyfuh45'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.lmssl5yf9p'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.lmssl5yf9p'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/server/app/cart/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/server/app/cart/page/app-build-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/server/app/cart/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/server/app/cart/page/app-build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.fv5kz5ev0ou'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.fv5kz5ev0ou'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.5b1knvie2g'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.5b1knvie2g'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.74fejantoom'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.74fejantoom'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.6t6mqgejirf'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.6t6mqgejirf'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.rgatmrp0wi'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.rgatmrp0wi'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.eq61fnfrda'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.eq61fnfrda'
+}
+[Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.en2x3ppk0zd'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.en2x3ppk0zd'
+}
+[Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.till44d4nbn'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.till44d4nbn'
+}
+[Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.f0fpz2n6gg'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.f0fpz2n6gg'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.154aczqph64'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.154aczqph64'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.ftd4yvq8arm'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.ftd4yvq8arm'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.7oh9nxqtprp'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.7oh9nxqtprp'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/server/app/favicon.ico/[__metadata_id__]/route/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/server/app/favicon.ico/[__metadata_id__]/route/app-paths-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.8mnnmutn5g8'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.8mnnmutn5g8'
+}
+[Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.d2vo7ptz2d'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.d2vo7ptz2d'
+}
+[Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.37yixdw74bj'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.37yixdw74bj'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/server/app/cart/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/server/app/cart/page/app-build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.ffn0xzehg2g'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.ffn0xzehg2g'
+}
+[Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/server/app/cart/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/server/app/cart/page/app-build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.4d2ffgnd5t6'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.4d2ffgnd5t6'
+}
+[Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.529ekr200g4'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.529ekr200g4'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/server/app/favicon.ico/[__metadata_id__]/route/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/server/app/favicon.ico/[__metadata_id__]/route/app-paths-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.9ug85wkxir7'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.9ug85wkxir7'
+}
+[Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.3fwsay8bhcq'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.3fwsay8bhcq'
+}
+[Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.bo6gmz3t366'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.bo6gmz3t366'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.hnf3gq09hqh'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.hnf3gq09hqh'
+}
+[Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/server/app/page/app-build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.tc93m2ephpn'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.tc93m2ephpn'
+}
+[Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.oc155reaghn'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/static/development/_buildManifest.js.tmp.oc155reaghn'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/base/Desktop/revive_life_vitality/.next/server/app/favicon.ico/[__metadata_id__]/route/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/base/Desktop/revive_life_vitality/.next/server/app/favicon.ico/[__metadata_id__]/route/app-paths-manifest.json'
+}
+[?25h
