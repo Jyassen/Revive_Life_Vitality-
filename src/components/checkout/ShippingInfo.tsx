@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useCheckout } from '@/context/CheckoutContext'
 import FormField from '@/components/forms/FormField'
 import Button from '@/components/ui/Button'
@@ -8,6 +8,7 @@ import { addressSchema } from '@/lib/validations/checkout'
 
 const ShippingInfo: React.FC = () => {
   const { 
+    customerInfo,
     shippingAddress, 
     setShippingAddress, 
     nextStep, 
@@ -18,8 +19,8 @@ const ShippingInfo: React.FC = () => {
   } = useCheckout()
   
   const [formData, setFormData] = useState({
-    firstName: shippingAddress?.firstName || '',
-    lastName: shippingAddress?.lastName || '',
+    firstName: shippingAddress?.firstName || customerInfo?.firstName || '',
+    lastName: shippingAddress?.lastName || customerInfo?.lastName || '',
     address1: shippingAddress?.address1 || '',
     address2: shippingAddress?.address2 || '',
     city: shippingAddress?.city || '',
@@ -80,6 +81,17 @@ const ShippingInfo: React.FC = () => {
     { value: 'WI', label: 'Wisconsin' },
     { value: 'WY', label: 'Wyoming' }
   ]
+
+  // Update form data when customer info becomes available
+  useEffect(() => {
+    if (customerInfo && (!formData.firstName || !formData.lastName)) {
+      setFormData(prev => ({
+        ...prev,
+        firstName: prev.firstName || customerInfo.firstName || '',
+        lastName: prev.lastName || customerInfo.lastName || ''
+      }))
+    }
+  }, [customerInfo, formData.firstName, formData.lastName])
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -196,7 +208,6 @@ const ShippingInfo: React.FC = () => {
         {/* Shipping Notice */}
         <div className="bg-brand-beige rounded-lg p-4 border-l-4 border-brand-green">
           <p className="text-sm text-brand-dark">
-            <strong>Free Shipping:</strong> Orders over $50 ship free! 
             Your order will be carefully packaged to maintain freshness and quality.
           </p>
         </div>

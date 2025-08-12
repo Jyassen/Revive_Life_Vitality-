@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Button from '@/components/ui/Button'
@@ -74,6 +74,19 @@ export default function ConfigurePackagePage() {
   const [quantity, setQuantity] = useState(1)
   const [selectedProducts, setSelectedProducts] = useState<{ [key: string]: number }>({})
   
+  const totalSelectedShots = useMemo(() => 
+    Object.values(selectedProducts).reduce((sum, qty) => sum + qty, 0), 
+    [selectedProducts]
+  )
+  const requiredShots = useMemo(() => 
+    packageInfo ? packageInfo.totalShots * quantity : 0, 
+    [packageInfo, quantity]
+  )
+  const isConfigurationValid = useMemo(() => 
+    totalSelectedShots === requiredShots, 
+    [totalSelectedShots, requiredShots]
+  )
+
   if (!packageInfo) {
     return (
       <div className="min-h-screen bg-brand-beige flex items-center justify-center">
@@ -92,10 +105,6 @@ export default function ConfigurePackagePage() {
       </div>
     )
   }
-
-  const totalSelectedShots = Object.values(selectedProducts).reduce((sum, qty) => sum + qty, 0)
-  const requiredShots = packageInfo.totalShots * quantity
-  const isConfigurationValid = totalSelectedShots === requiredShots
 
   const handleProductQuantityChange = (productId: string, change: number) => {
     setSelectedProducts(prev => {
@@ -163,6 +172,10 @@ export default function ConfigurePackagePage() {
                     src={packageInfo.image}
                     alt={packageInfo.name}
                     fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    priority={true}
+                    placeholder="blur"
+                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyb21llHqvqDMoIIIOCDkHqKt5xaWuofxKzs5GhkJJMsSmTrHsUIFHZh2ks7qjKMqygEHcOyDgdCDXCJPUGmMsj8z+HrJJTzP8AxY\\\\"
                     className="object-contain p-4"
                   />
                 </div>
@@ -234,6 +247,8 @@ export default function ConfigurePackagePage() {
                             src={product.image}
                             alt={product.name}
                             fill
+                            sizes="64px"
+                            loading="lazy"
                             className="object-contain p-1"
                           />
                         </div>

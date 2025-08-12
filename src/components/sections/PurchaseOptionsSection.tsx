@@ -83,6 +83,7 @@ const PurchaseOptionsSection: React.FC = () => {
                     src={pkg.image}
                     alt={pkg.title}
                     fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     className="object-contain"
                   />
                 </div>
@@ -115,10 +116,10 @@ const PurchaseOptionsSection: React.FC = () => {
                 
                 <button
                   onClick={() => handleConfigurePackage(pkg.id)}
-                  className={`w-full py-3 px-4 rounded-md font-medium text-center transition-colors duration-200 ${
+                  className={`w-full py-3 px-4 rounded-md font-medium text-center transition-colors duration-200 cursor-pointer ${
                     pkg.id === 'revive-club' 
-                      ? 'bg-brand-brown text-white hover:bg-brand-brown/90'
-                      : 'bg-brand-dark text-white hover:bg-brand-dark/90'
+                      ? 'bg-brand-brown text-white hover:bg-brand-brown/90 focus:ring-2 focus:ring-brand-brown/50'
+                      : 'bg-brand-dark text-white hover:bg-brand-dark/90 focus:ring-2 focus:ring-brand-dark/50'
                   }`}
                 >
                   {pkg.id === 'revive-club' ? 'Configure Subscription' : 'Configure Package'}

@@ -60,6 +60,7 @@ export default function CartPage() {
                           src={item.image}
                           alt={item.name}
                           fill
+                          sizes="(max-width: 640px) 80px, 120px"
                           className="object-contain p-2"
                         />
                       </div>
@@ -187,11 +188,6 @@ export default function CartPage() {
                   </Button>
                 </Link>
                 
-                <div className="mt-6 pt-6 border-t border-brand-brown/20">
-                  <p className="text-sm text-brand-brown text-center">
-                    Free shipping on orders over $50
-                  </p>
-                </div>
               </div>
             </div>
           </div>

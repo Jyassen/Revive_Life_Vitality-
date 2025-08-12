@@ -21,7 +21,6 @@ const FounderStorySection: React.FC = () => {
                 </div>
                 <div className="absolute bottom-4 left-4 right-4 bg-gradient-to-r from-brand-brown to-brand-brown/80 text-white text-center py-2 rounded shadow-lg">
                   <p className="text-sm font-medium">Everyl A. McMorris, PA-C</p>
-                  <p className="text-xs opacity-90">Founder & Medical Expert</p>
                 </div>
               </div>
             </div>

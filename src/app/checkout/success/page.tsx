@@ -1,11 +1,19 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Button from '@/components/ui/Button'
 import { CheckCircle, Package, Mail, Home } from 'lucide-react'
+import { useCheckout, CheckoutProvider } from '@/context/CheckoutContext'
 
-export default function CheckoutSuccessPage() {
+function CheckoutSuccessContent() {
+  const { customerInfo, shippingAddress } = useCheckout()
+  const [orderNumber, setOrderNumber] = useState<string>('')
+
+  useEffect(() => {
+    // Generate a mock order number for display
+    setOrderNumber(`RLV-${Date.now().toString().slice(-6)}`)
+  }, [])
   return (
     <div className="min-h-screen bg-brand-beige">
       <div className="container-custom section-padding">
@@ -16,9 +24,16 @@ export default function CheckoutSuccessPage() {
             <h1 className="font-playfair text-4xl lg:text-5xl mb-4 text-brand-dark">
               Order Confirmed!
             </h1>
-            <p className="text-xl text-brand-brown mb-8">
-              Thank you for your order. We&apos;re preparing your wellness shots with care.
-            </p>
+            {customerInfo && (
+              <p className="text-xl text-brand-brown mb-4">
+                Thank you{customerInfo.firstName ? `, ${customerInfo.firstName}` : ''}! We&apos;re preparing your wellness shots with care.
+              </p>
+            )}
+            {orderNumber && (
+              <p className="text-sm text-brand-brown mb-8">
+                Order #{orderNumber}
+              </p>
+            )}
           </div>
 
           {/* Order Details Card */}
@@ -35,7 +50,10 @@ export default function CheckoutSuccessPage() {
                     Order Confirmation
                   </h3>
                   <p className="text-sm text-brand-brown">
-                    You&apos;ll receive an email confirmation with your order details shortly.
+                    {customerInfo?.email ? 
+                      `You'll receive an email confirmation at ${customerInfo.email} shortly.` :
+                      "You'll receive an email confirmation with your order details shortly."
+                    }
                   </p>
                 </div>
               </div>
@@ -59,7 +77,12 @@ export default function CheckoutSuccessPage() {
                     Fast Delivery
                   </h3>
                   <p className="text-sm text-brand-brown">
-                    Your order will be shipped within 1-2 business days and delivered fresh to your door.
+                    Your order will be shipped within 1-2 business days and delivered fresh to your door
+                    {shippingAddress && (
+                      <>
+                        {' '}at {shippingAddress.address1}, {shippingAddress.city}, {shippingAddress.state} {shippingAddress.zipCode}
+                      </>
+                    )}.
                   </p>
                 </div>
               </div>
@@ -108,5 +131,13 @@ export default function CheckoutSuccessPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function CheckoutSuccessPage() {
+  return (
+    <CheckoutProvider>
+      <CheckoutSuccessContent />
+    </CheckoutProvider>
   )
 }

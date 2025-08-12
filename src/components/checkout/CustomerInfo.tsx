@@ -10,6 +10,8 @@ const CustomerInfo: React.FC = () => {
   const { customerInfo, setCustomerInfo, nextStep, errors, setError, clearErrors } = useCheckout()
   
   const [formData, setFormData] = useState({
+    firstName: customerInfo?.firstName || '',
+    lastName: customerInfo?.lastName || '',
     email: customerInfo?.email || '',
     phone: customerInfo?.phone || '',
     marketingConsent: customerInfo?.marketingConsent || false
@@ -52,6 +54,30 @@ const CustomerInfo: React.FC = () => {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            label="First Name"
+            name="firstName"
+            type="text"
+            placeholder="John"
+            value={formData.firstName}
+            onChange={(value) => handleInputChange('firstName', value)}
+            error={errors.firstName}
+            required
+          />
+          
+          <FormField
+            label="Last Name"
+            name="lastName"
+            type="text"
+            placeholder="Doe"
+            value={formData.lastName}
+            onChange={(value) => handleInputChange('lastName', value)}
+            error={errors.lastName}
+            required
+          />
+        </div>
+
         <FormField
           label="Email Address"
           name="email"

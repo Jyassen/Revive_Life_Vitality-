@@ -42,6 +42,11 @@ next-env.d.ts
 
 # system prompts
 Backend Developer System prompt.md
+Frontend Developer System Prompt.md
 
 # claude code guides
 Claude Code Sub-Agents Guide.md
+
+# development logs and notes
+lognotes.md
+server.log

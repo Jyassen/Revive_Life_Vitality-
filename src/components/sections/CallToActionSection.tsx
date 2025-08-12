@@ -36,7 +36,7 @@ const CallToActionSection: React.FC = () => {
             Ready to Revive Your Vitality?
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Choose the pack that&apos;s right for you and start your journey to better wellness today. Free shipping on orders over $50!
+            Choose the pack that&apos;s right for you and start your journey to better wellness today.
           </p>
         </div>
 

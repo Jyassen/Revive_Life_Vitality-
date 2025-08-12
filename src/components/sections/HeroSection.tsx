@@ -11,22 +11,38 @@ const HeroSection: React.FC = () => {
   };
   
   const handleShopNowClick = () => {
+    console.log('Shop Now button clicked!');
     // Find the purchase options section and scroll to it
     const purchaseSection = document.getElementById('purchase-options');
     if (purchaseSection) {
-      purchaseSection.scrollIntoView({ behavior: 'smooth' });
+      console.log('Found purchase section, scrolling...');
+      purchaseSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     } else {
       console.warn('Purchase options section (#purchase-options) not found for scrolling.');
+      // Fallback - try to find any purchase-related section
+      const fallbackSection = document.querySelector('[id*="purchase"], [id*="shop"]');
+      if (fallbackSection) {
+        console.log('Using fallback section for scrolling');
+        fallbackSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
   };
 
   const handleLearnMoreClick = () => {
+    console.log('Learn More button clicked!');
     // Find the comparison section and scroll to it
     const comparisonSection = document.getElementById('comparison');
     if (comparisonSection) {
-      comparisonSection.scrollIntoView({ behavior: 'smooth' });
+      console.log('Found comparison section, scrolling...');
+      comparisonSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     } else {
       console.warn('Comparison section (#comparison) not found for scrolling.');
+      // Fallback - try to find any comparison or about section
+      const fallbackSection = document.querySelector('[id*="comparison"], [id*="about"]');
+      if (fallbackSection) {
+        console.log('Using fallback section for scrolling');
+        fallbackSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
   };
 
