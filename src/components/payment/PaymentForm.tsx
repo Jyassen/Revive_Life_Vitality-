@@ -89,15 +89,29 @@ export default function PaymentForm({
     }
 
     try {
-      // Tokenize via hosted fields when enabled; otherwise use mock endpoint (dev/testing)
-      const token = useHostedFields
-        ? await tokenizeHosted()
-        : await tokenizeCard({
+      // Tokenize: prefer hosted fields when enabled and ready; gracefully
+      // fall back to server tokenization if hosted fields are unavailable
+      let token: string
+      if (useHostedFields) {
+        try {
+          if (!hostedReady) throw new Error('Hosted fields not ready')
+          token = await tokenizeHosted()
+        } catch {
+          token = await tokenizeCard({
             ...cardData,
             expiryMonth: monthTwoDigits,
             expiryYear: yearTwoDigits,
             number: sanitizedNumber,
           })
+        }
+      } else {
+        token = await tokenizeCard({
+          ...cardData,
+          expiryMonth: monthTwoDigits,
+          expiryYear: yearTwoDigits,
+          number: sanitizedNumber,
+        })
+      }
 
       // Ensure billing address is provided
       if (!billingAddress) {
