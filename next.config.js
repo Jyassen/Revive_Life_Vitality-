@@ -44,8 +44,8 @@ const nextConfig = {
               "img-src 'self' data: blob:",
               // Styles from self; inline for Tailwind/Next dev overlay
               "style-src 'self' 'unsafe-inline'",
-              // Scripts: allow eval and inline in dev only
-              `script-src 'self'${process.env.NODE_ENV === 'development' ? " 'unsafe-eval' 'unsafe-inline'" : ''}`,
+              // Scripts: Next.js emits small inline scripts for RSC/streaming; allow inline always, eval only in dev
+              `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === 'development' ? " 'unsafe-eval'" : ''}`,
               // Frames: allow Clover iframes when using hosted fields (sandbox + prod)
               'frame-src \"self\" https://sandbox.dev.clover.com https://api.clover.com',
               // Fonts
