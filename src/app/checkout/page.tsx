@@ -12,6 +12,26 @@ import BillingAddressForm from '@/components/payment/BillingAddressForm'
 import Image from 'next/image'
 import { customerInfoSchema, addressSchema, PaymentInfo, OrderSummary, Address } from '@/lib/validations/checkout'
 
+interface CheckoutFormData {
+  // Customer Info
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+  marketingConsent: boolean
+  // Shipping Address
+  shippingFirstName: string
+  shippingLastName: string
+  address1: string
+  address2: string
+  city: string
+  state: string
+  zipCode: string
+  country: string
+  // Additional fields
+  specialInstructions: string
+}
+
 function CheckoutContent() {
   const { items, totalPrice } = useCart()
   const { 
@@ -60,6 +80,7 @@ function CheckoutContent() {
 
     setOrderSummary(summary)
     // NOTE: Do not include setOrderSummary in deps; its identity may change per render via context
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [totalPrice])
 
   // Payment submission function from PaymentForm
@@ -71,7 +92,7 @@ function CheckoutContent() {
   }, [])
 
   // Form state
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<CheckoutFormData>({
     // Customer Info
     firstName: customerInfo?.firstName || '',
     lastName: customerInfo?.lastName || '',
@@ -145,14 +166,14 @@ function CheckoutContent() {
   ]
 
   const handleInputChange = (field: string, value: string | boolean) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
+    setFormData((prev: CheckoutFormData) => ({ ...prev, [field]: value }))
     // Clear field-specific error if it exists, but don't call setError if there's no error
     // This prevents infinite loops
   }
 
   // Auto-fill shipping name from customer info
   const copyCustomerNameToShipping = () => {
-    setFormData(prev => ({
+    setFormData((prev: CheckoutFormData) => ({
       ...prev,
       shippingFirstName: prev.firstName,
       shippingLastName: prev.lastName
@@ -195,7 +216,7 @@ function CheckoutContent() {
       try {
         const href = await startHostedCheckout(items)
         window.location.href = href
-      } catch (e) {
+      } catch {
         // error handled in context
       }
       return
@@ -372,7 +393,7 @@ function CheckoutContent() {
                       name="marketingConsent"
                       type="checkbox"
                       checked={formData.marketingConsent}
-                      onChange={(e) => handleInputChange('marketingConsent', e.target.checked)}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('marketingConsent', e.target.checked)}
                       className="mt-1 w-4 h-4 text-brand-brown bg-white border-brand-brown/30 rounded focus:ring-brand-brown/50 focus:ring-2"
                     />
                     <label 
