@@ -160,7 +160,7 @@ export const ProductFeaturesSection: React.FC = () => {
           <ProductFeature
             name="Red Beet Heat – Energizing Wellness Shot"
             tagline="Naturally Fire Up Your Energy"
-            description="Meet Red Beet Heat – a 2oz powerhouse that gives you a natural pre-workout kick. This nutritious red shot blends organic beets, ginger, and a dash of cayenne for a spicy kick. Formulated to boost circulation and metabolism, it's perfect for an afternoon slump or a gym session. No jitters, no crash – just plant-powered vitality. Earthy-sweet with a zesty bite, you'll feel the invigorating kick in minutes."
+            description="Fuel your workouts and power through the day with Red Beet Heat, a 2oz natural pre-workout shot packed with organic beets, ginger, turmeric, and cayenne. Formulated to boost circulation and metabolism, it's perfect for an afternoon slump or a gym session. No jitters, no crash – just plant-powered vitality. Earthy-sweet with a zesty bite, you'll feel the invigorating kick in minutes."
             benefits={[
               "Energy & Stamina: Increases blood flow for improved endurance (thanks to nitrate-rich beets)",
               "Metabolism Boost: Naturally boosts metabolism with cayenne & ginger for calorie burn",
@@ -196,7 +196,7 @@ export const RedBeetHeatFeature: React.FC = () => {
           <ProductFeature
             name="Red Beet Heat – Energizing Wellness Shot"
             tagline="Naturally Fire Up Your Energy"
-            description="Meet Red Beet Heat – a 2oz powerhouse that gives you a natural pre-workout kick. This nutritious red shot blends organic beets, ginger, and a dash of cayenne for a spicy kick. Formulated to boost circulation and metabolism, it's perfect for an afternoon slump or a gym session. No jitters, no crash – just plant-powered vitality. Earthy-sweet with a zesty bite, you'll feel the invigorating kick in minutes."
+            description="Fuel your workouts and power through the day with Red Beet Heat, a 2oz natural pre-workout shot packed with organic beets, ginger, turmeric, and cayenne. Formulated to boost circulation and metabolism, it's perfect for an afternoon slump or a gym session. No jitters, no crash – just plant-powered vitality. Earthy-sweet with a zesty bite, you'll feel the invigorating kick in minutes."
             benefits={[
               "Energy & Stamina: Increases blood flow for improved endurance (thanks to nitrate-rich beets)",
               "Metabolism Boost: Naturally boosts metabolism with cayenne & ginger for calorie burn",

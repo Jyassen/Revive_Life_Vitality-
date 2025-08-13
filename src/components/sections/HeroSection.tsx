@@ -93,7 +93,7 @@ const HeroSection: React.FC = () => {
             {/* Mobile Content */}
             <div className="text-center animate-fade-in">
               <p className="text-gray-700 mb-8 text-base md:text-lg leading-relaxed">
-                Two potent 2oz shots - crafted by nutritionists from organic superfoods - to energize your body and fortify your immunity. All organic. Zero junk. Real results.
+                Potent 2oz wellness shots, formulated by a board-certified Physician Assistant using organic superfoods, to energize your body, boost immunity, and support whole-body wellness. Cold-pressed, UMF-certified Manuka, and nitrate-rich beets for results you can feel fast.
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 mb-8 justify-center">
@@ -165,7 +165,7 @@ const HeroSection: React.FC = () => {
                 Small Shots,<br /><span className="text-brand-brown">Big Vitality</span>
               </h1>
               <p className="text-gray-700 mb-10 max-w-lg text-base md:text-lg leading-relaxed">
-                Two potent 2oz shots - crafted by nutritionists from organic superfoods - to energize your body and fortify your immunity. All organic. Zero junk. Real results.
+                Potent 2oz wellness shots, formulated by a board-certified Physician Assistant using organic superfoods, to energize your body, boost immunity, and support whole-body wellness. Cold-pressed, UMF-certified Manuka, and nitrate-rich beets for results you can feel fast.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 mb-12">
                 <button 

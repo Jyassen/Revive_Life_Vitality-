@@ -13,7 +13,7 @@ const products = [
     price: '$12.99',
     category: 'Energy',
     image: '/images/site pics/Red Beet Heat Finished.png',
-    description: 'A bold, energizing blend featuring Red Beets, Turmeric, Ginger, Mint, Wheatgrass, Cayenne Pepper, and Lemon Juice. Designed to rev up circulation and metabolism.',
+    description: 'Fuel your workouts and power through the day with Red Beet Heat, a 2oz natural pre-workout shot packed with organic beets, ginger, turmeric, and cayenne. Formulated to boost circulation and metabolism, it\'s perfect for an afternoon slump or a gym session. No jitters, no crash – just plant-powered vitality. Earthy-sweet with a zesty bite, you\'ll feel the invigorating kick in minutes.',
     benefits: [
       'Energy & Circulation Boost',
       'Supports Healthy Blood Flow (Nitrates)',

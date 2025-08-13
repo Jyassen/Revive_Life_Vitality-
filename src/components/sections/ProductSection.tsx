@@ -22,7 +22,7 @@ const products: Product[] = [
     price: '$12.99',
     image: '/images/site pics/Red Beet Heat Finished.png',
     category: 'Energy',
-    description: 'A powerful energy shot with organic red beet, cayenne, and B vitamins to enhance physical performance and mental focus.',
+    description: 'Fuel your workouts and power through the day with Red Beet Heat, a 2oz natural pre-workout shot packed with organic beets, ginger, turmeric, and cayenne. Formulated to boost circulation and metabolism, it\'s perfect for an afternoon slump or a gym session. No jitters, no crash – just plant-powered vitality. Earthy-sweet with a zesty bite, you\'ll feel the invigorating kick in minutes.',
     benefits: ['Boosts blood flow', 'Enhances workout performance', 'Improves endurance']
   },
   {
