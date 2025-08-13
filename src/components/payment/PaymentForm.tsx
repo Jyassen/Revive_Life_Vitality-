@@ -34,22 +34,65 @@ export default function PaymentForm({
   const cloverJsUrl = process.env.NEXT_PUBLIC_CLOVER_JS_URL
   const [hostedReady, setHostedReady] = useState(false)
 
-  // Load Clover JS when hosted fields are enabled
+  // Load Clover JS when hosted fields are enabled and initialize elements
   useEffect(() => {
     if (!useHostedFields) return
     if (!cloverJsUrl) {
       setTokenError('Clover hosted fields not configured: missing NEXT_PUBLIC_CLOVER_JS_URL')
       return
     }
+    const onLoaded = () => {
+      try {
+        const anyWindow = window as unknown as {
+          Clover?: {
+            new (key: string, opts: { merchantId: string }): CloverInstance
+          } & ((key: string, opts: { merchantId: string }) => CloverInstance)
+          cloverCreateToken?: () => Promise<{ id: string }>
+        }
+        if (!anyWindow.Clover) {
+          throw new Error('Clover SDK not available')
+        }
+        const publishable = process.env.NEXT_PUBLIC_CLOVER_PUBLISHABLE_KEY
+        const merchantId = process.env.NEXT_PUBLIC_CLOVER_MERCHANT_ID
+        if (!publishable || !merchantId) {
+          throw new Error('Missing Clover publishable key or merchant id')
+        }
+        const clover = new (anyWindow.Clover as unknown as CloverCtor)(publishable, { merchantId })
+        const elements = clover.elements()
+        const numberEl = elements.create('CARD_NUMBER')
+        const dateEl = elements.create('CARD_DATE')
+        const cvvEl = elements.create('CARD_CVV')
+        const postalEl = elements.create('CARD_POSTAL_CODE')
+        const mountAndCatch = (el: CloverElement, id: string) => {
+          const node = document.getElementById(id)
+          if (node) el.mount(`#${id}`)
+        }
+        mountAndCatch(numberEl, 'card-number')
+        mountAndCatch(dateEl, 'card-date')
+        mountAndCatch(cvvEl, 'card-cvv')
+        mountAndCatch(postalEl, 'card-postal-code')
+        ;(window as unknown as { cloverCreateToken?: () => Promise<string> }).cloverCreateToken = async (): Promise<string> => {
+          const result = await clover.createToken()
+          if (result?.errors) throw new Error('Tokenization failed')
+          const token = (result?.token?.id || result?.token || result?.id) as string
+          if (!token) throw new Error('Missing token from Clover')
+          return token
+        }
+        setHostedReady(true)
+      } catch (e) {
+        setTokenError(e instanceof Error ? e.message : 'Failed to initialize Clover hosted fields')
+      }
+    }
+
     const existing = document.querySelector(`script[src=\"${cloverJsUrl}\"]`)
     if (existing) {
-      setHostedReady(true)
+      onLoaded()
       return
     }
     const script = document.createElement('script')
     script.src = cloverJsUrl
     script.async = true
-    script.onload = () => setHostedReady(true)
+    script.onload = onLoaded
     script.onerror = () => setTokenError('Failed to load Clover hosted fields script')
     document.head.appendChild(script)
     return () => {
@@ -174,6 +217,12 @@ export default function PaymentForm({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // Minimal types for Clover SDK to avoid any
+  type CloverElement = { mount: (selector: string) => void }
+  type CloverElements = { create: (type: 'CARD_NUMBER'|'CARD_DATE'|'CARD_CVV'|'CARD_POSTAL_CODE') => CloverElement }
+  type CloverInstance = { elements: () => CloverElements; createToken: () => Promise<{ token?: { id?: string }, id?: string, errors?: unknown }> }
+  type CloverCtor = new (key: string, opts: { merchantId: string }) => CloverInstance
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
