@@ -72,16 +72,22 @@ export default function PaymentForm({
     if (isLoading || isTokenizing) return
 
     // Basic client-side guard before tokenization
-    const sanitizedNumber = cardData.number.replace(/\s/g, '')
-    const monthTwoDigits = cardData.expiryMonth.padStart(2, '0')
-    const yearTwoDigits = cardData.expiryYear.padStart(2, '0')
+    const sanitizedNumber = cardData.number.replace(/\D/g, '')
+    const rawMonth = cardData.expiryMonth.replace(/\D/g, '')
+    const rawYear = cardData.expiryYear.replace(/\D/g, '')
+    const monthTwoDigits = rawMonth.padStart(2, '0')
+    const yearTwoDigits = rawYear.padStart(2, '0')
+    const cvvDigits = cardData.cvv.replace(/\D/g, '')
+
+    const monthValid = /^(0[1-9]|1[0-2])$/.test(monthTwoDigits)
+    const yearValid = /^\d{2}$/.test(yearTwoDigits)
+    const numberLengthValid = sanitizedNumber.length >= 13 && sanitizedNumber.length <= 19
+    const luhnValid = luhnCheck(sanitizedNumber)
+    const cvvValid = cvvDigits.length >= 3
+    const nameValid = cardData.name.trim().length > 0
+
     const hasValidBasics =
-      sanitizedNumber.length >= 13 &&
-      sanitizedNumber.length <= 19 &&
-      monthTwoDigits.length === 2 &&
-      yearTwoDigits.length === 2 &&
-      cardData.cvv.length >= 3 &&
-      cardData.name.trim().length > 0
+      numberLengthValid && monthValid && yearValid && cvvValid && nameValid && luhnValid
 
     if (!hasValidBasics) {
       setTokenError('Please enter complete and valid card details')
@@ -142,6 +148,23 @@ export default function PaymentForm({
     } catch (error) {
       console.error('Payment submission error:', error)
     }
+  }
+
+  function luhnCheck(value: string): boolean {
+    if (!value) return false
+    let sum = 0
+    let shouldDouble = false
+    for (let i = value.length - 1; i >= 0; i--) {
+      let digit = parseInt(value.charAt(i), 10)
+      if (Number.isNaN(digit)) return false
+      if (shouldDouble) {
+        digit *= 2
+        if (digit > 9) digit -= 9
+      }
+      sum += digit
+      shouldDouble = !shouldDouble
+    }
+    return sum % 10 === 0
   }
 
   // Expose submit function to parent only once
