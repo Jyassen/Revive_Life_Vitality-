@@ -173,7 +173,7 @@ const ContactSection: React.FC = () => {
               </svg>
             </div>
             <h3 className="text-lg font-semibold text-gray-800 mb-1">Email Us</h3>
-            <p className="text-gray-600">support@revivelife.com</p>
+            <p className="text-gray-600">revivelifevitality@gmail.com</p>
           </div>
           
           <div>
@@ -183,7 +183,7 @@ const ContactSection: React.FC = () => {
               </svg>
             </div>
             <h3 className="text-lg font-semibold text-gray-800 mb-1">Call Us</h3>
-            <p className="text-gray-600">(800) 555-VITA</p>
+            <p className="text-gray-600">(631) 397-2010</p>
           </div>
           
           <div>
@@ -193,7 +193,11 @@ const ContactSection: React.FC = () => {
               </svg>
             </div>
             <h3 className="text-lg font-semibold text-gray-800 mb-1">Social Media</h3>
-            <p className="text-gray-600">@ReviveLifeVitality</p>
+            <p className="text-gray-600">
+              <a href="https://instagram.com/revivelifevitality" target="_blank" rel="noopener noreferrer" className="underline hover:text-brand-green">
+                @revivelifevitality
+              </a>
+            </p>
           </div>
         </div>
       </div>
