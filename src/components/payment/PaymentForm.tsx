@@ -33,6 +33,7 @@ export default function PaymentForm({
   const useHostedFields = process.env.NEXT_PUBLIC_USE_CLOVER_HOSTED === 'true'
   const cloverJsUrl = process.env.NEXT_PUBLIC_CLOVER_JS_URL
   const [hostedReady, setHostedReady] = useState(false)
+  const [forceManual, setForceManual] = useState(false)
 
   // Load Clover JS when hosted fields are enabled and initialize elements
   useEffect(() => {
@@ -79,8 +80,10 @@ export default function PaymentForm({
           return token
         }
         setHostedReady(true)
+        setForceManual(false)
       } catch (e) {
         setTokenError(e instanceof Error ? e.message : 'Failed to initialize Clover hosted fields')
+        setForceManual(true)
       }
     }
 
@@ -93,13 +96,28 @@ export default function PaymentForm({
     script.src = cloverJsUrl
     script.async = true
     script.onload = onLoaded
-    script.onerror = () => setTokenError('Failed to load Clover hosted fields script')
+    script.onerror = () => { 
+      setTokenError('Failed to load Clover hosted fields script')
+      setForceManual(true)
+    }
     document.head.appendChild(script)
     return () => {
       script.onload = null
       script.onerror = null
     }
   }, [useHostedFields, cloverJsUrl])
+
+  // Timeout fallback: switch to manual entry if hosted fields don't become ready
+  useEffect(() => {
+    if (!useHostedFields || hostedReady || forceManual) return
+    const t = setTimeout(() => {
+      if (!hostedReady) {
+        setTokenError((prev) => prev || 'Hosted fields timed out, using secure manual entry')
+        setForceManual(true)
+      }
+    }, 7000)
+    return () => clearTimeout(t)
+  }, [useHostedFields, hostedReady, forceManual])
   const [cardData, setCardData] = useState<CreditCard>({
     number: '',
     expiryMonth: '',
@@ -372,11 +390,28 @@ export default function PaymentForm({
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {useHostedFields ? (
+        {useHostedFields && !forceManual ? (
           <>
             <div className="mb-4">
               <p className="text-sm text-brand-brown mb-2">Secure Card Entry</p>
-              <div id="clover-card-container" className="border rounded-lg p-4 min-h-[100px] bg-brand-beige/30" />
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs text-brand-brown mb-1">Card Number</label>
+                  <div id="card-number" className="border rounded-lg px-3 py-2 h-12 bg-brand-beige/30" />
+                </div>
+                <div>
+                  <label className="block text-xs text-brand-brown mb-1">Expiration</label>
+                  <div id="card-date" className="border rounded-lg px-3 py-2 h-12 bg-brand-beige/30" />
+                </div>
+                <div>
+                  <label className="block text-xs text-brand-brown mb-1">CVV</label>
+                  <div id="card-cvv" className="border rounded-lg px-3 py-2 h-12 bg-brand-beige/30" />
+                </div>
+                <div>
+                  <label className="block text-xs text-brand-brown mb-1">Postal Code</label>
+                  <div id="card-postal-code" className="border rounded-lg px-3 py-2 h-12 bg-brand-beige/30" />
+                </div>
+              </div>
               {!hostedReady && (
                 <p className="text-xs text-brand-brown mt-2">Loading secure card fields…</p>
               )}
