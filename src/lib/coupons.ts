@@ -26,6 +26,12 @@ const COUPONS: CouponDefinition[] = [
     active: true,
     minSubtotal: 30,
   },
+  {
+    code: 'CHYNA2025',
+    type: 'percent',
+    value: 100,
+    active: true,
+  },
 ]
 
 export function getCouponByCode(code: string): CouponDefinition | null {

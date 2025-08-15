@@ -64,10 +64,9 @@ function CheckoutContent() {
     }
   }, [items.length, router])
 
-  // Apply coupon and calculate order summary
+  // Apply coupon and calculate order summary (tax computed on post-discount)
   useEffect(() => {
     const subtotal = totalPrice
-    const tax = subtotal * 0.08 // 8% tax rate - should be calculated based on shipping address
     const shipping = 10.00 // Flat $10 shipping fee
     const calc = async () => {
       let discount = 0
@@ -82,7 +81,9 @@ function CheckoutContent() {
           if (data?.valid) discount = data.discount || 0
         } catch {}
       }
-      const total = subtotal + tax + shipping - discount
+      const taxableAmount = Math.max(0, subtotal - discount)
+      const tax = taxableAmount * 0.08 // 8% tax rate
+      const total = taxableAmount + tax + shipping
 
       const summary: OrderSummary = {
         subtotal,
