@@ -575,17 +575,37 @@ function CheckoutContent() {
               {/* Payment Section - Shown after customer/shipping info is complete */}
               {isCustomerShippingComplete && (
                 <>
-                  <PaymentForm
-                    onSubmit={handlePaymentSubmit}
-                    isLoading={isLoading || paymentStatus === 'processing'}
-                    errors={errors}
-                    billingAddress={sameAsShipping ? shippingAddress : billingAddress}
-                    sameAsShipping={sameAsShipping}
-                    onBillingAddressChange={handleBillingAddressChange}
-                    onSameAsShippingChange={setSameAsShipping}
-                    showSubmitButton={false}
-                    onPaymentReady={setPaymentSubmitFunction}
-                  />
+                  <div className="grid lg:grid-cols-2 gap-8">
+                    <PaymentForm
+                      onSubmit={handlePaymentSubmit}
+                      isLoading={isLoading || paymentStatus === 'processing'}
+                      errors={errors}
+                      billingAddress={sameAsShipping ? shippingAddress : billingAddress}
+                      sameAsShipping={sameAsShipping}
+                      onBillingAddressChange={handleBillingAddressChange}
+                      onSameAsShippingChange={setSameAsShipping}
+                      showSubmitButton={false}
+                      onPaymentReady={setPaymentSubmitFunction}
+                    />
+
+                    {/* Billing address side-by-side when not same as shipping */}
+                    {!sameAsShipping && (
+                      <BillingAddressForm
+                        address={billingAddress || {
+                          firstName: '',
+                          lastName: '',
+                          address1: '',
+                          address2: '',
+                          city: '',
+                          state: '',
+                          zipCode: '',
+                          country: 'US'
+                        }}
+                        onChange={handleBillingAddressChange}
+                        errors={errors}
+                      />
+                    )}
+                  </div>
 
                   {/* Billing Address Form - Shown when not same as shipping */}
                   {!sameAsShipping && (

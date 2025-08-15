@@ -469,19 +469,19 @@ export default function PaymentForm({
                 required
               />
             </div>
-
-            {/* Cardholder Name */}
-            <FormField
-              label="Cardholder Name"
-              name="cardholderName"
-              placeholder="John Doe"
-              value={cardData.name}
-              onChange={(value) => handleCardFieldChange('name', value)}
-              error={errors.cardholderName}
-              required
-            />
           </>
         )}
+
+        {/* Cardholder Name (shown for both hosted and manual) */}
+        <FormField
+          label="Cardholder Name"
+          name="cardholderName"
+          placeholder="John Doe"
+          value={cardData.name}
+          onChange={(value) => handleCardFieldChange('name', value)}
+          error={errors.cardholderName}
+          required
+        />
 
         {/* Billing Address Toggle */}
         <div className="pt-4 border-t border-brand-brown/20">
