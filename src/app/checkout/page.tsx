@@ -52,7 +52,9 @@ function CheckoutContent() {
     clearErrors,
     isLoading,
     processPayment,
-    startHostedCheckout
+    startHostedCheckout,
+    couponCode,
+    setCouponCode
   } = useCheckout()
   const router = useRouter()
 
@@ -62,26 +64,40 @@ function CheckoutContent() {
     }
   }, [items.length, router])
 
-  // Calculate order summary
+  // Apply coupon and calculate order summary
   useEffect(() => {
     const subtotal = totalPrice
     const tax = subtotal * 0.08 // 8% tax rate - should be calculated based on shipping address
     const shipping = 10.00 // Flat $10 shipping fee
-    const discount = 0 // Would be calculated based on coupon code
-    const total = subtotal + tax + shipping - discount
+    const calc = async () => {
+      let discount = 0
+      if (couponCode) {
+        try {
+          const resp = await fetch('/api/coupons/validate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code: couponCode, subtotal }),
+          })
+          const data = await resp.json()
+          if (data?.valid) discount = data.discount || 0
+        } catch {}
+      }
+      const total = subtotal + tax + shipping - discount
 
-    const summary: OrderSummary = {
-      subtotal,
-      tax,
-      shipping,
-      discount,
-      total
+      const summary: OrderSummary = {
+        subtotal,
+        tax,
+        shipping,
+        discount,
+        total
+      }
+
+      setOrderSummary(summary)
     }
-
-    setOrderSummary(summary)
+    calc()
     // NOTE: Do not include setOrderSummary in deps; its identity may change per render via context
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [totalPrice])
+  }, [totalPrice, couponCode])
 
   // Payment submission function from PaymentForm
   const paymentSubmitRef = useRef<(() => Promise<void>) | null>(null)
@@ -675,6 +691,27 @@ function CheckoutContent() {
 
                 {/* Order Totals */}
                 <div className="space-y-3 pt-6 border-t border-brand-brown/20">
+                  {/* Coupon Code */}
+                  <div className="mb-4">
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        placeholder="Coupon code"
+                        value={couponCode}
+                        onChange={(e) => setCouponCode(e.target.value)}
+                        className="flex-1 border border-brand-brown/30 rounded-lg px-3 py-2 text-sm"
+                        aria-label="Coupon code"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => { /* validation happens automatically via effect */ }}
+                        className="btn-outline px-4 py-2 text-sm"
+                        aria-label="Apply coupon"
+                      >
+                        Apply
+                      </button>
+                    </div>
+                  </div>
                   <div className="flex justify-between text-brand-dark">
                     <span>Subtotal ({items.reduce((sum, item) => sum + item.quantity, 0)} items)</span>
                     <span>${orderSummary?.subtotal.toFixed(2) || totalPrice.toFixed(2)}</span>
