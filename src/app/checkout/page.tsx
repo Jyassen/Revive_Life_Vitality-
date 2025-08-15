@@ -54,7 +54,9 @@ function CheckoutContent() {
     processPayment,
     startHostedCheckout,
     couponCode,
-    setCouponCode
+    setCouponCode,
+    appliedCouponCode,
+    setAppliedCouponCode
   } = useCheckout()
   const router = useRouter()
 
@@ -70,12 +72,12 @@ function CheckoutContent() {
     const shipping = 10.00 // Flat $10 shipping fee
     const calc = async () => {
       let discount = 0
-      if (couponCode) {
+      if (appliedCouponCode) {
         try {
           const resp = await fetch('/api/coupons/validate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ code: couponCode, subtotal }),
+            body: JSON.stringify({ code: appliedCouponCode, subtotal, shipping }),
           })
           const data = await resp.json()
           if (data?.valid) discount = data.discount || 0
@@ -98,7 +100,7 @@ function CheckoutContent() {
     calc()
     // NOTE: Do not include setOrderSummary in deps; its identity may change per render via context
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [totalPrice, couponCode])
+  }, [totalPrice, appliedCouponCode])
 
   // Payment submission function from PaymentForm
   const paymentSubmitRef = useRef<(() => Promise<void>) | null>(null)
@@ -725,7 +727,7 @@ function CheckoutContent() {
                       />
                       <button
                         type="button"
-                        onClick={() => { /* validation happens automatically via effect */ }}
+                        onClick={() => setAppliedCouponCode(couponCode)}
                         className="btn-outline px-4 py-2 text-sm"
                         aria-label="Apply coupon"
                       >

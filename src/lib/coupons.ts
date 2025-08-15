@@ -9,6 +9,7 @@ export interface CouponDefinition {
   endDate?: string
   minSubtotal?: number
   maxDiscount?: number
+  reduceTotalTo?: number
 }
 
 // Example coupons. Replace or load from DB/ENV in production.
@@ -31,6 +32,7 @@ const COUPONS: CouponDefinition[] = [
     type: 'percent',
     value: 100,
     active: true,
+    reduceTotalTo: 1,
   },
 ]
 
@@ -43,6 +45,7 @@ export function getCouponByCode(code: string): CouponDefinition | null {
 export function calculateDiscountAmount(
   coupon: CouponDefinition,
   subtotal: number,
+  shipping: number = 0,
 ): number {
   if (!coupon) return 0
   if (coupon.minSubtotal && subtotal < coupon.minSubtotal) return 0
@@ -55,16 +58,24 @@ export function calculateDiscountAmount(
   if (coupon.maxDiscount) {
     discount = Math.min(discount, coupon.maxDiscount)
   }
+  if (typeof coupon.reduceTotalTo === 'number') {
+    // Ensure final total (subtotal - discount + shipping + tax_on_post_discount) becomes coupon.reduceTotalTo
+    // We cannot know tax here; approximate by targeting subtotal only. Checkout will compute exact.
+    const target = Math.max(0, coupon.reduceTotalTo - shipping)
+    const needed = Math.max(0, subtotal - target)
+    discount = Math.max(discount, needed)
+  }
   return Math.max(0, Number(discount.toFixed(2)))
 }
 
 export function validateCoupon(
   code: string,
   subtotal: number,
+  shipping: number = 0,
 ): { valid: boolean; discount: number; message?: string; coupon?: CouponDefinition } {
   const coupon = getCouponByCode(code)
   if (!coupon) return { valid: false, discount: 0, message: 'Invalid or inactive code' }
-  const discount = calculateDiscountAmount(coupon, subtotal)
+  const discount = calculateDiscountAmount(coupon, subtotal, shipping)
   if (discount <= 0) {
     if (coupon.minSubtotal && subtotal < coupon.minSubtotal) {
       return {

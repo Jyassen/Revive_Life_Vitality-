@@ -24,6 +24,7 @@ interface CheckoutState {
   paymentInfo: PaymentInfo | null
   specialInstructions: string
   couponCode: string
+  appliedCouponCode: string
   orderSummary: OrderSummary | null
   orderId: string | null
   paymentStatus: 'idle' | 'processing' | 'succeeded' | 'failed'
@@ -43,6 +44,7 @@ type CheckoutAction =
   | { type: 'SET_PAYMENT_INFO'; payload: PaymentInfo }
   | { type: 'SET_SPECIAL_INSTRUCTIONS'; payload: string }
   | { type: 'SET_COUPON_CODE'; payload: string }
+  | { type: 'SET_APPLIED_COUPON'; payload: string }
   | { type: 'SET_ORDER_SUMMARY'; payload: OrderSummary }
   | { type: 'SET_ORDER_ID'; payload: string }
   | { type: 'SET_PAYMENT_STATUS'; payload: 'idle' | 'processing' | 'succeeded' | 'failed' }
@@ -63,6 +65,7 @@ interface CheckoutContextType extends CheckoutState {
   setPaymentInfo: (info: PaymentInfo) => void
   setSpecialInstructions: (instructions: string) => void
   setCouponCode: (code: string) => void
+  setAppliedCouponCode: (code: string) => void
   setOrderSummary: (summary: OrderSummary) => void
   setOrderId: (id: string) => void
   setPaymentStatus: (status: 'idle' | 'processing' | 'succeeded' | 'failed') => void
@@ -88,6 +91,7 @@ const initialState: CheckoutState = {
   paymentInfo: null,
   specialInstructions: '',
   couponCode: '',
+  appliedCouponCode: '',
   orderSummary: null,
   orderId: null,
   paymentStatus: 'idle',
@@ -119,6 +123,8 @@ const checkoutReducer = (state: CheckoutState, action: CheckoutAction): Checkout
       return { ...state, specialInstructions: action.payload }
     case 'SET_COUPON_CODE':
       return { ...state, couponCode: action.payload }
+    case 'SET_APPLIED_COUPON':
+      return { ...state, appliedCouponCode: action.payload }
     case 'SET_ORDER_SUMMARY':
       return { ...state, orderSummary: action.payload }
     case 'SET_ORDER_ID':
@@ -194,6 +200,10 @@ export const CheckoutProvider: React.FC<CheckoutProviderProps> = ({ children }) 
     dispatch({ type: 'SET_COUPON_CODE', payload: code })
   }
 
+  const setAppliedCouponCode = (code: string) => {
+    dispatch({ type: 'SET_APPLIED_COUPON', payload: code })
+  }
+
   const setOrderSummary = (summary: OrderSummary) => {
     dispatch({ type: 'SET_ORDER_SUMMARY', payload: summary })
   }
@@ -258,7 +268,7 @@ export const CheckoutProvider: React.FC<CheckoutProviderProps> = ({ children }) 
         paymentToken: state.paymentInfo.token,
         summary: state.orderSummary,
         specialInstructions: state.specialInstructions || undefined,
-        couponCode: state.couponCode || undefined,
+        couponCode: state.appliedCouponCode || undefined,
       }
 
       const response = await fetch('/api/payment/charge', {
@@ -346,6 +356,7 @@ export const CheckoutProvider: React.FC<CheckoutProviderProps> = ({ children }) 
     setPaymentInfo,
     setSpecialInstructions,
     setCouponCode,
+    setAppliedCouponCode,
     setOrderSummary,
     setOrderId,
     setPaymentStatus,
