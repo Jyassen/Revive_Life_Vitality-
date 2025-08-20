@@ -72,10 +72,9 @@ ${orderData.shippingAddress.address1}
 ${orderData.shippingAddress.address2 ? orderData.shippingAddress.address2 + '\n' : ''}${orderData.shippingAddress.city}, ${orderData.shippingAddress.state} ${orderData.shippingAddress.zipCode}
 
 Order Summary:
-Subtotal: $${orderData.subtotal.toFixed(2)}
+Items: $${orderData.subtotal.toFixed(2)}
 Shipping: $${orderData.shipping.toFixed(2)}
-Tax: $${orderData.tax.toFixed(2)}
-Total: $${orderData.total.toFixed(2)}
+Subtotal: $${(orderData.subtotal + orderData.shipping).toFixed(2)}
 
 Your order will be shipped within 1-2 business days.
 

@@ -57,14 +57,13 @@ function CheckoutContent() {
     }
   }, [items.length, router])
 
-  // Calculate order summary (no coupon)
+  // Calculate order summary (no coupon, no tax)
   useEffect(() => {
     const subtotal = totalPrice
     const shipping = 10.00 // Flat $10 shipping fee
     const discount = 0
-    const taxableAmount = Math.max(0, subtotal - discount)
-    const tax = taxableAmount * 0.08
-    const total = taxableAmount + tax + shipping
+    const tax = 0
+    const total = Math.max(0, subtotal - discount) + shipping
     const summary: OrderSummary = { subtotal, tax, shipping, discount, total }
     setOrderSummary(summary)
     // NOTE: Do not include setOrderSummary in deps; its identity may change per render via context
@@ -639,7 +638,7 @@ function CheckoutContent() {
                   ))}
                 </div>
 
-                {/* Order Totals (coupon removed) */}
+                {/* Order Totals (no tax, coupon removed) */}
                 <div className="space-y-3 pt-6 border-t border-brand-brown/20">
                   <div className="flex justify-between text-brand-dark">
                     <span>Subtotal ({items.reduce((sum, item) => sum + item.quantity, 0)} items)</span>
@@ -651,17 +650,11 @@ function CheckoutContent() {
                     <span>${orderSummary?.shipping.toFixed(2) || '10.00'}</span>
                   </div>
 
-                  <div className="flex justify-between text-brand-brown">
-                    <span>Tax</span>
-                    <span>${orderSummary?.tax.toFixed(2) || '0.00'}</span>
-                  </div>
-
-                  {/* Discount row removed */}
-
+                  {/* Final displayed amount as Subtotal (price + shipping) */}
                   <div className="border-t border-brand-brown/20 pt-3">
                     <div className="flex justify-between text-xl font-medium text-brand-dark">
-                      <span>Total</span>
-                      <span>${orderSummary?.total.toFixed(2) || totalPrice.toFixed(2)}</span>
+                      <span>Subtotal</span>
+                      <span>${orderSummary?.total.toFixed(2) || (totalPrice + 10).toFixed(2)}</span>
                     </div>
                   </div>
 
