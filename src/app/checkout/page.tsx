@@ -51,6 +51,7 @@ function CheckoutContent() {
     setError, 
     clearErrors,
     isLoading,
+    setLoading,
     processPayment,
     startHostedCheckout,
     couponCode,
@@ -369,6 +370,39 @@ function CheckoutContent() {
       
       setCustomerInfo(customerData)
       setShippingAddress(shippingData)
+
+      // If using payment links, email order + redirect immediately (skip card section)
+      if (process.env.NEXT_PUBLIC_USE_PAYMENT_LINKS === 'true') {
+        try {
+          setLoading(true)
+          const resp = await fetch('/api/payment-link', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              items: items.map(i => ({
+                id: i.id,
+                name: i.name,
+                price: parseFloat(i.price.replace('$', '')),
+                quantity: i.quantity,
+                image: i.image,
+              })),
+              customer: customerData,
+              shippingAddress: shippingData,
+              summary: orderSummary,
+              packageId: items[0]?.id,
+            }),
+          })
+          const data = await resp.json()
+          if (!resp.ok || !data?.href) {
+            setError('payment', data?.error || 'Unable to start payment')
+          } else {
+            window.location.href = data.href as string
+          }
+        } finally {
+          setLoading(false)
+        }
+        return
+      }
     }
   }
 
@@ -618,8 +652,8 @@ function CheckoutContent() {
 
               </form>
 
-              {/* Payment Section - Shown after customer/shipping info is complete */}
-              {isCustomerShippingComplete && (
+              {/* Payment Section - Shown after customer/shipping info is complete (hidden in payment-link mode) */}
+              {isCustomerShippingComplete && process.env.NEXT_PUBLIC_USE_PAYMENT_LINKS !== 'true' && (
                 <>
                   <div className="grid lg:grid-cols-2 gap-8">
                     <PaymentForm
