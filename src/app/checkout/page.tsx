@@ -7,10 +7,9 @@ import { CheckoutProvider, useCheckout } from '@/context/CheckoutContext'
 import ConfiguredPackageDisplay from '@/components/cart/ConfiguredPackageDisplay'
 import FormField from '@/components/forms/FormField'
 import Button from '@/components/ui/Button'
-import PaymentForm from '@/components/payment/PaymentForm'
-import BillingAddressForm from '@/components/payment/BillingAddressForm'
+// Payment form imports removed for payment-link-only flow
 import Image from 'next/image'
-import { customerInfoSchema, addressSchema, PaymentInfo, OrderSummary, Address } from '@/lib/validations/checkout'
+import { customerInfoSchema, addressSchema, OrderSummary, Address } from '@/lib/validations/checkout'
 
 interface CheckoutFormData {
   // Customer Info
@@ -39,11 +38,7 @@ function CheckoutContent() {
     setCustomerInfo,
     shippingAddress, 
     setShippingAddress,
-    billingAddress,
-    setBillingAddress,
-    sameAsShipping,
-    setSameAsShipping,
-    setPaymentInfo,
+    // billing state not used in payment link flow
     orderSummary,
     setOrderSummary,
     paymentStatus,
@@ -52,12 +47,7 @@ function CheckoutContent() {
     clearErrors,
     isLoading,
     setLoading,
-    processPayment,
-    startHostedCheckout,
-    couponCode,
-    setCouponCode,
-    appliedCouponCode,
-    setAppliedCouponCode
+    // embedded/hosted payments and coupons removed in payment link flow
   } = useCheckout()
   const router = useRouter()
 
@@ -67,49 +57,23 @@ function CheckoutContent() {
     }
   }, [items.length, router])
 
-  // Apply coupon and calculate order summary (tax computed on post-discount)
+  // Calculate order summary (no coupon)
   useEffect(() => {
     const subtotal = totalPrice
     const shipping = 10.00 // Flat $10 shipping fee
-    const calc = async () => {
-      let discount = 0
-      if (appliedCouponCode) {
-        try {
-          const resp = await fetch('/api/coupons/validate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ code: appliedCouponCode, subtotal, shipping }),
-          })
-          const data = await resp.json()
-          if (data?.valid) discount = data.discount || 0
-        } catch {}
-      }
-      const taxableAmount = Math.max(0, subtotal - discount)
-      const tax = taxableAmount * 0.08 // 8% tax rate
-      const total = taxableAmount + tax + shipping
-
-      const summary: OrderSummary = {
-        subtotal,
-        tax,
-        shipping,
-        discount,
-        total
-      }
-
-      setOrderSummary(summary)
-    }
-    calc()
+    const discount = 0
+    const taxableAmount = Math.max(0, subtotal - discount)
+    const tax = taxableAmount * 0.08
+    const total = taxableAmount + tax + shipping
+    const summary: OrderSummary = { subtotal, tax, shipping, discount, total }
+    setOrderSummary(summary)
     // NOTE: Do not include setOrderSummary in deps; its identity may change per render via context
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [totalPrice, appliedCouponCode])
+  }, [totalPrice])
 
-  // Payment submission function from PaymentForm
+  // No embedded payment used in payment-link flow
   const paymentSubmitRef = useRef<(() => Promise<void>) | null>(null)
-  
-  // Stable callback to prevent render-time setState
-  const setPaymentSubmitFunction = useCallback((fn: () => Promise<void>) => {
-    paymentSubmitRef.current = fn
-  }, [])
+  const setPaymentSubmitFunction = useCallback((fn: () => Promise<void>) => { paymentSubmitRef.current = fn }, [])
 
   // Form state
   const [formData, setFormData] = useState<CheckoutFormData>({
@@ -200,94 +164,11 @@ function CheckoutContent() {
     }))
   }
 
-  // Payment handling
-  const handlePaymentSubmit = async (paymentData: PaymentInfo) => {
-    try {
-      // Set payment info in context
-      setPaymentInfo(paymentData)
+  // No embedded payment handling
 
-      // If not using same address as shipping, update billing address
-      if (!paymentData.sameAsShipping && paymentData.billingAddress) {
-        setBillingAddress(paymentData.billingAddress)
-      } else if (shippingAddress) {
-        setBillingAddress(shippingAddress)
-      }
+  // Billing address not used in payment-link flow
 
-      // Process the payment
-      await processPayment(items)
-
-      // Redirect to success page
-      router.push('/checkout/success')
-      
-    } catch (error) {
-      console.error('Payment error:', error)
-      // Error handling is done in the context
-    }
-  }
-
-  const handleBillingAddressChange = (address: Address) => {
-    setBillingAddress(address)
-  }
-
-  // Handle external payment submit
-  const handleExternalPaymentSubmit = async () => {
-    // Payment Link mode: email order + redirect to link
-    if (process.env.NEXT_PUBLIC_USE_PAYMENT_LINKS === 'true') {
-      try {
-        const resp = await fetch('/api/payment-link', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            items: items.map(i => ({
-              id: i.id,
-              name: i.name,
-              price: parseFloat(i.price.replace('$', '')),
-              quantity: i.quantity,
-              image: i.image,
-            })),
-            customer: {
-              firstName: formData.firstName,
-              lastName: formData.lastName,
-              email: formData.email,
-              phone: formData.phone,
-            },
-            shippingAddress: {
-              firstName: formData.shippingFirstName || formData.firstName,
-              lastName: formData.shippingLastName || formData.lastName,
-              address1: formData.address1,
-              address2: formData.address2,
-              city: formData.city,
-              state: formData.state,
-              zipCode: formData.zipCode,
-              country: formData.country,
-            },
-            summary: orderSummary,
-            packageId: items[0]?.id,
-          }),
-        })
-        const data = await resp.json()
-        if (!resp.ok || !data?.href) throw new Error(data?.error || 'Unable to create payment link')
-        window.location.href = data.href as string
-      } catch (err) {
-        console.error(err)
-        setError('payment', err instanceof Error ? err.message : 'Unable to start payment')
-      }
-      return
-    }
-
-    // If hosted checkout is enabled via env, redirect there; else trigger embedded form
-    if (process.env.NEXT_PUBLIC_USE_CLOVER_HOSTED === 'true') {
-      try {
-        const href = await startHostedCheckout(items)
-        window.location.href = href
-      } catch {
-        // error handled in context
-      }
-      return
-    }
-    const submitFn = paymentSubmitRef.current
-    if (submitFn) await submitFn()
-  }
+  // No external submit; redirect occurs after shipping form submit
 
   const handleCustomerShippingSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -652,102 +533,7 @@ function CheckoutContent() {
 
               </form>
 
-              {/* Payment Section - Shown after customer/shipping info is complete (hidden in payment-link mode) */}
-              {isCustomerShippingComplete && process.env.NEXT_PUBLIC_USE_PAYMENT_LINKS !== 'true' && (
-                <>
-                  <div className="grid lg:grid-cols-2 gap-8">
-                    <PaymentForm
-                      onSubmit={handlePaymentSubmit}
-                      isLoading={isLoading || paymentStatus === 'processing'}
-                      errors={errors}
-                      billingAddress={sameAsShipping ? shippingAddress : billingAddress}
-                      sameAsShipping={sameAsShipping}
-                      onBillingAddressChange={handleBillingAddressChange}
-                      onSameAsShippingChange={setSameAsShipping}
-                      showSubmitButton={false}
-                      onPaymentReady={setPaymentSubmitFunction}
-                    />
-
-                    {/* Billing address side-by-side when not same as shipping */}
-                    {!sameAsShipping && (
-                      <BillingAddressForm
-                        address={billingAddress || {
-                          firstName: '',
-                          lastName: '',
-                          address1: '',
-                          address2: '',
-                          city: '',
-                          state: '',
-                          zipCode: '',
-                          country: 'US'
-                        }}
-                        onChange={handleBillingAddressChange}
-                        errors={errors}
-                      />
-                    )}
-                  </div>
-
-                  {/* Billing Address Form - Shown when not same as shipping */}
-                  {!sameAsShipping && (
-                    <BillingAddressForm
-                      address={billingAddress || {
-                        firstName: '',
-                        lastName: '',
-                        address1: '',
-                        address2: '',
-                        city: '',
-                        state: '',
-                        zipCode: '',
-                        country: 'US'
-                      }}
-                      onChange={handleBillingAddressChange}
-                      errors={errors}
-                    />
-                  )}
-
-                  {/* Submit Button */}
-                  <div className="bg-white rounded-2xl p-8 shadow-soft">
-                    <Button
-                      type="button"
-                      variant="primary"
-                      size="lg"
-                      disabled={isLoading || paymentStatus === 'processing'}
-                      ariaLabel="Complete payment and place order"
-                      className="w-full"
-                      onClick={handleExternalPaymentSubmit}
-                    >
-                      {isLoading || paymentStatus === 'processing' ? 'Processing...' : 'Complete Order'}
-                    </Button>
-                  </div>
-
-                  {/* Payment Status Display */}
-                  {paymentStatus === 'failed' && errors.payment && (
-                    <div className="bg-red-50 border border-red-200 rounded-2xl p-8">
-                      <div className="text-center">
-                        <h3 className="font-playfair text-xl text-red-600 mb-2">
-                          Payment Failed
-                        </h3>
-                        <p className="text-red-600 mb-4">
-                          {errors.payment}
-                        </p>
-                        <p className="text-sm text-red-500">
-                          Please check your payment information and try again.
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Guest Checkout Notice */}
-                  <div className="bg-white rounded-2xl p-6 shadow-soft">
-                    <div className="bg-brand-beige rounded-lg p-4 border-l-4 border-brand-brown">
-                      <p className="text-sm text-brand-dark">
-                        <strong>Guest Checkout:</strong> You&apos;re checking out as a guest. 
-                        Create an account after your purchase to track orders and save your preferences.
-                      </p>
-                    </div>
-                  </div>
-                </>
-              )}
+              {/* Payment Section removed in payment-link flow */}
             </div>
 
             {/* Order Summary Sidebar */}
@@ -790,29 +576,8 @@ function CheckoutContent() {
                   ))}
                 </div>
 
-                {/* Order Totals */}
+                {/* Order Totals (coupon removed) */}
                 <div className="space-y-3 pt-6 border-t border-brand-brown/20">
-                  {/* Coupon Code */}
-                  <div className="mb-4">
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        placeholder="Coupon code"
-                        value={couponCode}
-                        onChange={(e) => setCouponCode(e.target.value)}
-                        className="flex-1 border border-brand-brown/30 rounded-lg px-3 py-2 text-sm"
-                        aria-label="Coupon code"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setAppliedCouponCode(couponCode)}
-                        className="btn-outline px-4 py-2 text-sm"
-                        aria-label="Apply coupon"
-                      >
-                        Apply
-                      </button>
-                    </div>
-                  </div>
                   <div className="flex justify-between text-brand-dark">
                     <span>Subtotal ({items.reduce((sum, item) => sum + item.quantity, 0)} items)</span>
                     <span>${orderSummary?.subtotal.toFixed(2) || totalPrice.toFixed(2)}</span>
@@ -828,12 +593,7 @@ function CheckoutContent() {
                     <span>${orderSummary?.tax.toFixed(2) || '0.00'}</span>
                   </div>
 
-                  {orderSummary?.discount && orderSummary.discount > 0 && (
-                    <div className="flex justify-between text-green-600">
-                      <span>Discount</span>
-                      <span>-${orderSummary.discount.toFixed(2)}</span>
-                    </div>
-                  )}
+                  {/* Discount row removed */}
 
                   <div className="border-t border-brand-brown/20 pt-3">
                     <div className="flex justify-between text-xl font-medium text-brand-dark">
