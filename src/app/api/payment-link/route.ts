@@ -101,7 +101,7 @@ export async function POST(req: NextRequest) {
 			return NextResponse.json({ error: 'Missing payment link for package' }, { status: 400 })
 		}
 		return NextResponse.json({ href: link, orderNumber: orderData.orderNumber })
-	} catch (e) {
+	} catch {
 		return NextResponse.json({ error: 'Server error' }, { status: 500 })
 	}
 }
