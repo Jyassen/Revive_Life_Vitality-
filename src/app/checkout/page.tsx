@@ -41,7 +41,7 @@ function CheckoutContent() {
     // billing state not used in payment link flow
     orderSummary,
     setOrderSummary,
-    paymentStatus,
+    // paymentStatus,
     errors, 
     setError, 
     clearErrors,
