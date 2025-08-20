@@ -74,10 +74,20 @@ export async function POST(request: NextRequest) {
     const data = await resp.json().catch(() => ({}))
 
     if (!resp.ok) {
+      console.error('Clover API Error:', {
+        status: resp.status,
+        statusText: resp.statusText,
+        data,
+        url,
+        merchantId: CLOVER_MERCHANT_ID,
+        environment: CLOVER_ENVIRONMENT
+      })
+      
       return NextResponse.json({
         error: 'Failed to create hosted checkout session',
         status: resp.status,
-        message: data?.message || data?.error || 'Unknown error',
+        message: data?.message || data?.error || `HTTP ${resp.status}: ${resp.statusText}`,
+        details: data
       }, { status: resp.status })
     }
 

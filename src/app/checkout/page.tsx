@@ -230,6 +230,50 @@ function CheckoutContent() {
 
   // Handle external payment submit
   const handleExternalPaymentSubmit = async () => {
+    // Payment Link mode: email order + redirect to link
+    if (process.env.NEXT_PUBLIC_USE_PAYMENT_LINKS === 'true') {
+      try {
+        const resp = await fetch('/api/payment-link', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            items: items.map(i => ({
+              id: i.id,
+              name: i.name,
+              price: parseFloat(i.price.replace('$', '')),
+              quantity: i.quantity,
+              image: i.image,
+            })),
+            customer: {
+              firstName: formData.firstName,
+              lastName: formData.lastName,
+              email: formData.email,
+              phone: formData.phone,
+            },
+            shippingAddress: {
+              firstName: formData.shippingFirstName || formData.firstName,
+              lastName: formData.shippingLastName || formData.lastName,
+              address1: formData.address1,
+              address2: formData.address2,
+              city: formData.city,
+              state: formData.state,
+              zipCode: formData.zipCode,
+              country: formData.country,
+            },
+            summary: orderSummary,
+            packageId: items[0]?.id,
+          }),
+        })
+        const data = await resp.json()
+        if (!resp.ok || !data?.href) throw new Error(data?.error || 'Unable to create payment link')
+        window.location.href = data.href as string
+      } catch (err) {
+        console.error(err)
+        setError('payment', err instanceof Error ? err.message : 'Unable to start payment')
+      }
+      return
+    }
+
     // If hosted checkout is enabled via env, redirect there; else trigger embedded form
     if (process.env.NEXT_PUBLIC_USE_CLOVER_HOSTED === 'true') {
       try {

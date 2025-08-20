@@ -65,8 +65,16 @@ export default function PaymentForm({
         const cvvEl = elements.create('CARD_CVV')
         const postalEl = elements.create('CARD_POSTAL_CODE')
         const mountAndCatch = (el: CloverElement, id: string) => {
-          const node = document.getElementById(id)
-          if (node) el.mount(`#${id}`)
+          try {
+            const node = document.getElementById(id)
+            if (node) {
+              el.mount(`#${id}`)
+            } else {
+              console.warn(`Element with id "${id}" not found for Clover hosted field`)
+            }
+          } catch (error) {
+            console.error(`Failed to mount Clover element "${id}":`, error)
+          }
         }
         mountAndCatch(numberEl, 'card-number')
         mountAndCatch(dateEl, 'card-date')
