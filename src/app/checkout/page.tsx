@@ -168,6 +168,54 @@ function CheckoutContent() {
 
   // No external submit; redirect occurs after shipping form submit
 
+  const startPaymentLinkRedirect = async () => {
+    try {
+      setLoading(true)
+      const customerData = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+        marketingConsent: formData.marketingConsent
+      }
+      const shippingData = {
+        firstName: formData.shippingFirstName || formData.firstName,
+        lastName: formData.shippingLastName || formData.lastName,
+        address1: formData.address1,
+        address2: formData.address2,
+        city: formData.city,
+        state: formData.state,
+        zipCode: formData.zipCode,
+        country: formData.country
+      }
+      const resp = await fetch('/api/payment-link', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: items.map(i => ({
+            id: i.id,
+            name: i.name,
+            price: parseFloat(i.price.replace('$', '')),
+            quantity: i.quantity,
+            image: i.image,
+          })),
+          customer: customerData,
+          shippingAddress: shippingData,
+          summary: orderSummary,
+          packageId: items[0]?.id,
+        }),
+      })
+      const data = await resp.json()
+      if (!resp.ok || !data?.href) {
+        setError('payment', data?.error || 'Unable to start payment')
+      } else {
+        window.location.href = data.href as string
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const handleCustomerShippingSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     clearErrors()
@@ -523,6 +571,23 @@ function CheckoutContent() {
                       disabled={isLoading}
                       ariaLabel="Continue to payment"
                       className="w-full btn-primary text-lg py-4"
+                    >
+                      Continue to Payment
+                    </Button>
+                  </div>
+                )}
+
+                {/* Fallback button if validation succeeded but redirect failed or was blocked */}
+                {isCustomerShippingComplete && (
+                  <div className="bg-white rounded-2xl p-8 shadow-soft">
+                    <Button
+                      type="button"
+                      variant="primary"
+                      size="lg"
+                      disabled={isLoading}
+                      ariaLabel="Continue to payment"
+                      className="w-full btn-primary text-lg py-4"
+                      onClick={startPaymentLinkRedirect}
                     >
                       Continue to Payment
                     </Button>
