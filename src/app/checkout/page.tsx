@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState, useRef, useCallback } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useCart } from '@/context/CartContext'
 import { CheckoutProvider, useCheckout } from '@/context/CheckoutContext'
@@ -9,7 +9,7 @@ import FormField from '@/components/forms/FormField'
 import Button from '@/components/ui/Button'
 // Payment form imports removed for payment-link-only flow
 import Image from 'next/image'
-import { customerInfoSchema, addressSchema, OrderSummary, Address } from '@/lib/validations/checkout'
+import { customerInfoSchema, addressSchema, OrderSummary } from '@/lib/validations/checkout'
 
 interface CheckoutFormData {
   // Customer Info
@@ -72,8 +72,6 @@ function CheckoutContent() {
   }, [totalPrice])
 
   // No embedded payment used in payment-link flow
-  const paymentSubmitRef = useRef<(() => Promise<void>) | null>(null)
-  const setPaymentSubmitFunction = useCallback((fn: () => Promise<void>) => { paymentSubmitRef.current = fn }, [])
 
   // Form state
   const [formData, setFormData] = useState<CheckoutFormData>({
