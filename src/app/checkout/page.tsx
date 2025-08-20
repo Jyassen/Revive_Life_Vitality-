@@ -202,7 +202,7 @@ function CheckoutContent() {
           customer: customerData,
           shippingAddress: shippingData,
           summary: orderSummary,
-          packageId: (items[0] as any)?.packageConfig?.packageId || items[0]?.id,
+          packageId: (items[0] && 'packageConfig' in items[0] && (items[0] as { packageConfig?: { packageId?: string } }).packageConfig?.packageId) || items[0]?.id,
         }),
       })
       const data = await resp.json()
@@ -316,7 +316,7 @@ function CheckoutContent() {
               customer: customerData,
               shippingAddress: shippingData,
               summary: orderSummary,
-              packageId: (items[0] as any)?.packageConfig?.packageId || items[0]?.id,
+              packageId: (items[0] && 'packageConfig' in items[0] && (items[0] as { packageConfig?: { packageId?: string } }).packageConfig?.packageId) || items[0]?.id,
             }),
           })
           const data = await resp.json()
