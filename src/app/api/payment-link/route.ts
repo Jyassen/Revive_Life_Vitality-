@@ -41,7 +41,7 @@ function resolvePaymentLink(packageId?: string): string | null {
 	const map: Record<string, string | undefined> = {
 		'starter-pack': process.env.STARTER_PACK_LINK || 'https://link.clover.com/urlshortener/rZ46w5',
 		'pro-pack': process.env.PRO_PACK_LINK || 'https://link.clover.com/urlshortener/HQF62w',
-		'revive-club': process.env.ELITE_PACK_LINK || process.env.REVIVE_CLUB_LINK || 'https://link.clover.com/urlshortener/gCV9Dm',
+		'revive-club': process.env.REVIVE_CLUB_LINK || 'https://link.clover.com/urlshortener/gCV9Dm',
 	}
 	return (packageId && map[packageId]) || null
 }
