@@ -46,20 +46,29 @@ function resolvePaymentLink(packageId?: string): string | null {
 }
 
 async function sendEmail(to: string, subject: string, text: string) {
-	// Best-effort email via SMTP if configured, otherwise no-op
+	// Prefer Resend if API key is available
+	const resendKey = process.env.RESEND_API_KEY
+	const from = process.env.EMAIL_FROM || process.env.SMTP_FROM || 'no-reply@revivelifevitality.com'
+	if (resendKey) {
+		const { Resend } = await import('resend')
+		const resend = new Resend(resendKey)
+		await resend.emails.send({ from, to, subject, text })
+		return
+	}
+	// Fallback to SMTP if configured
 	const host = process.env.SMTP_HOST
 	const user = process.env.SMTP_USER
 	const pass = process.env.SMTP_PASS
-	const from = process.env.SMTP_FROM || 'no-reply@revivelifevitality.com'
-	if (!host || !user || !pass) return
-	const nodemailer = await import('nodemailer')
-	const transporter = nodemailer.createTransport({
-		host,
-		port: Number(process.env.SMTP_PORT || 587),
-		secure: false,
-		auth: { user, pass },
-	})
-	await transporter.sendMail({ from, to, subject, text })
+	if (host && user && pass) {
+		const nodemailer = await import('nodemailer')
+		const transporter = nodemailer.createTransport({
+			host,
+			port: Number(process.env.SMTP_PORT || 587),
+			secure: false,
+			auth: { user, pass },
+		})
+		await transporter.sendMail({ from, to, subject, text })
+	}
 }
 
 export async function POST(req: NextRequest) {
