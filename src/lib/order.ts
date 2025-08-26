@@ -17,6 +17,7 @@ export interface OrderData {
   tax: number
   total: number
   createdAt: Date
+  specialInstructions?: string
 }
 
 export function createOrderData(
@@ -28,7 +29,8 @@ export function createOrderData(
     shipping: number
     tax: number
     total: number
-  }
+  },
+  specialInstructions?: string
 ): OrderData {
   const orderNumber = `RLV-${Date.now().toString().slice(-6)}-${Math.random().toString(36).substr(2, 3).toUpperCase()}`
   
@@ -47,7 +49,8 @@ export function createOrderData(
     shipping: pricing.shipping,
     tax: pricing.tax,
     total: pricing.total,
-    createdAt: new Date()
+    createdAt: new Date(),
+    specialInstructions
   }
 }
 
@@ -55,6 +58,9 @@ export function formatOrderForEmail(orderData: OrderData): string {
   const itemsList = orderData.items
     .map(item => `${item.name} (Qty: ${item.quantity}) - ${item.price}`)
     .join('\n')
+  const special = orderData.specialInstructions
+    ? `\nSpecial Instructions:\n${orderData.specialInstructions}\n`
+    : ''
 
   return `
 Order Confirmation - ${orderData.orderNumber}
@@ -76,7 +82,7 @@ Items: $${orderData.subtotal.toFixed(2)}
 Shipping: $${orderData.shipping.toFixed(2)}
 Subtotal: $${(orderData.subtotal + orderData.shipping).toFixed(2)}
 
-Your order will be shipped within 1-2 business days.
+${special}Your order will be shipped within 1-2 business days.
 
 Thank you for choosing Revive Life Vitality!
 `.trim()

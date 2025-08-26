@@ -201,6 +201,7 @@ function CheckoutContent() {
           customer: customerData,
           shippingAddress: shippingData,
           summary: orderSummary,
+          specialInstructions: formData.specialInstructions || undefined,
           packageId: (items[0] && 'packageConfig' in items[0] && (items[0] as { packageConfig?: { packageId?: string } }).packageConfig?.packageId) || items[0]?.id,
         }),
       })

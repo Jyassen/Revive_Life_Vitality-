@@ -33,6 +33,8 @@ const payloadSchema = z.object({
 		total: z.number(),
 		coupon: z.string().optional(),
 	}),
+	/** Optional special instructions to include in the notification email */
+	specialInstructions: z.string().max(500).optional(),
 	packageId: z.string().optional(),
 })
 
@@ -79,7 +81,7 @@ export async function POST(req: NextRequest) {
 		if (!parsed.success) {
 			return NextResponse.json({ error: 'Invalid payload', details: parsed.error.errors }, { status: 400 })
 		}
-		const { items, customer, shippingAddress, summary, packageId } = parsed.data
+		const { items, customer, shippingAddress, summary, specialInstructions, packageId } = parsed.data
 
 		const orderData = createOrderData(
 			{
@@ -91,7 +93,8 @@ export async function POST(req: NextRequest) {
 			},
 			shippingAddress,
 			items.map(i => ({ id: i.id, name: i.name, price: `$${i.price.toFixed(2)}`, image: i.image || '', quantity: i.quantity })),
-			{ subtotal: summary.subtotal, shipping: summary.shipping, tax: summary.tax, total: summary.total }
+			{ subtotal: summary.subtotal, shipping: summary.shipping, tax: summary.tax, total: summary.total },
+			specialInstructions
 		)
 		const emailBody = formatOrderForEmail(orderData)
 		const notify = process.env.ORDER_NOTIFY_EMAIL || 'revivelifevitality@gmail.com'
