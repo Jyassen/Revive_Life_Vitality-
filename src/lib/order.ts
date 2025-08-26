@@ -97,15 +97,7 @@ export function formatOrderForVendorEmail(orderData: OrderData): string {
   }
 
   const itemBlocks = orderData.items.map(item => {
-    const cfg = (item as any).packageConfig as
-      | {
-          packageName: string
-          quantity: number
-          totalShots: number
-          selectedProducts: { productId: string; quantity: number }[]
-          subscription?: { frequency: 'weekly' | 'monthly'; discount: number }
-        }
-      | undefined
+    const cfg = item.packageConfig
 
     if (!cfg) {
       return [
