@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { createOrderData, formatOrderForEmail } from '@/lib/order'
+import { createOrderData, formatOrderForVendorEmail } from '@/lib/order'
 
 const payloadSchema = z.object({
 	items: z.array(z.object({
@@ -9,6 +9,22 @@ const payloadSchema = z.object({
 		price: z.number(),
 		quantity: z.number().int().positive(),
 		image: z.string().optional(),
+		packageConfig: z.object({
+			packageId: z.string(),
+			packageName: z.string(),
+			packagePrice: z.string(),
+			packageImage: z.string(),
+			totalShots: z.number().int().positive(),
+			quantity: z.number().int().positive(),
+			selectedProducts: z.array(z.object({
+				productId: z.string(),
+				quantity: z.number().int().nonnegative(),
+			})),
+			subscription: z.object({
+				frequency: z.enum(['weekly','monthly']),
+				discount: z.number().nonnegative(),
+			}).optional(),
+		}).optional(),
 	})).min(1),
 	customer: z.object({
 		firstName: z.string(),
@@ -92,11 +108,18 @@ export async function POST(req: NextRequest) {
 				marketingConsent: false,
 			},
 			shippingAddress,
-			items.map(i => ({ id: i.id, name: i.name, price: `$${i.price.toFixed(2)}`, image: i.image || '', quantity: i.quantity })),
+			items.map(i => ({
+				id: i.id,
+				name: i.name,
+				price: `$${i.price.toFixed(2)}`,
+				image: i.image || '',
+				quantity: i.quantity,
+				...(i.packageConfig ? { packageConfig: i.packageConfig } : {}),
+			})),
 			{ subtotal: summary.subtotal, shipping: summary.shipping, tax: summary.tax, total: summary.total },
 			specialInstructions
 		)
-		const emailBody = formatOrderForEmail(orderData)
+		const emailBody = formatOrderForVendorEmail(orderData)
 		const notify = process.env.ORDER_NOTIFY_EMAIL || 'revivelifevitality@gmail.com'
 		await sendEmail(notify, `New Order (Payment Link) - ${orderData.orderNumber}`, emailBody)
 

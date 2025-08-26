@@ -197,6 +197,7 @@ function CheckoutContent() {
             price: parseFloat(i.price.replace('$', '')),
             quantity: i.quantity,
             image: i.image,
+            ...(('packageConfig' in i && i.packageConfig) ? { packageConfig: i.packageConfig } : {}),
           })),
           customer: customerData,
           shippingAddress: shippingData,
