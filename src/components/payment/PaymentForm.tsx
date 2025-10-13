@@ -1,562 +1,396 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { CreditCard, PaymentInfo } from '@/lib/validations/checkout'
+import React, { useState, useEffect, useRef } from 'react'
+import { PaymentInfo } from '@/lib/validations/checkout'
 import FormField from '@/components/forms/FormField'
 import Button from '@/components/ui/Button'
-import { formatCreditCardNumber } from '@/lib/utils/formatters'
-
 import { Address } from '@/lib/validations/checkout'
+import {
+	loadCloverSDK,
+	initializeClover,
+	createHostedFields,
+	tokenizePayment,
+	getCloverConfig,
+	validateFields,
+	CloverSDK,
+	CloverElement,
+	FieldState,
+	CloverFieldType,
+	CloverFieldEvent,
+	CLOVER_FIELD_STYLES
+} from '@/lib/clover-secure'
 
 interface PaymentFormProps {
-  onSubmit: (paymentInfo: PaymentInfo) => Promise<void>
-  isLoading?: boolean
-  errors?: Record<string, string>
-  billingAddress?: Address | null
-  sameAsShipping?: boolean
-  onBillingAddressChange?: (address: Address) => void
-  onSameAsShippingChange?: (same: boolean) => void
-  showSubmitButton?: boolean
-  onPaymentReady?: (submitFunction: () => Promise<void>) => void
+	onSubmit: (paymentInfo: PaymentInfo) => Promise<void>
+	isLoading?: boolean
+	errors?: Record<string, string>
+	billingAddress?: Address | null
+	sameAsShipping?: boolean
+	onBillingAddressChange?: (address: Address) => void
+	onSameAsShippingChange?: (same: boolean) => void
+	showSubmitButton?: boolean
+	onPaymentReady?: (submitFunction: () => Promise<void>) => void
 }
 
 export default function PaymentForm({
-  onSubmit,
-  isLoading = false,
-  errors = {},
-  billingAddress,
-  sameAsShipping = true,
-  onSameAsShippingChange,
-  showSubmitButton = true,
-  onPaymentReady
+	onSubmit,
+	isLoading = false,
+	errors = {},
+	billingAddress,
+	sameAsShipping = true,
+	onSameAsShippingChange,
+	showSubmitButton = true,
+	onPaymentReady
 }: PaymentFormProps) {
-  const useHostedFields = process.env.NEXT_PUBLIC_USE_CLOVER_HOSTED === 'true'
-  const cloverJsUrl = process.env.NEXT_PUBLIC_CLOVER_JS_URL
-  const [hostedReady, setHostedReady] = useState(false)
-  const [forceManual, setForceManual] = useState(false)
+	const [isSDKLoaded, setIsSDKLoaded] = useState(false)
+	const [isFieldsReady, setIsFieldsReady] = useState(false)
+	const [isTokenizing, setIsTokenizing] = useState(false)
+	const [tokenError, setTokenError] = useState<string>('')
+	const [cardholderName, setCardholderName] = useState('')
+	const [fieldStates, setFieldStates] = useState<FieldState>({
+		cardNumber: false,
+		cardDate: false,
+		cardCvv: false,
+		cardPostal: false,
+	})
 
-  // Load Clover JS when hosted fields are enabled and initialize elements
-  useEffect(() => {
-    if (!useHostedFields) return
-    if (!cloverJsUrl) {
-      setTokenError('Clover hosted fields not configured: missing NEXT_PUBLIC_CLOVER_JS_URL')
-      return
-    }
-    const onLoaded = () => {
-      try {
-        const anyWindow = window as unknown as {
-          Clover?: {
-            new (key: string, opts: { merchantId: string }): CloverInstance
-          } & ((key: string, opts: { merchantId: string }) => CloverInstance)
-          cloverCreateToken?: () => Promise<{ id: string }>
-        }
-        if (!anyWindow.Clover) {
-          throw new Error('Clover SDK not available')
-        }
-        const publishable = process.env.NEXT_PUBLIC_CLOVER_PUBLISHABLE_KEY
-        const merchantId = process.env.NEXT_PUBLIC_CLOVER_MERCHANT_ID
-        if (!publishable || !merchantId) {
-          throw new Error('Missing Clover publishable key or merchant id')
-        }
-        const clover = new (anyWindow.Clover as unknown as CloverCtor)(publishable, { merchantId })
-        const elements = clover.elements()
-        const numberEl = elements.create('CARD_NUMBER')
-        const dateEl = elements.create('CARD_DATE')
-        const cvvEl = elements.create('CARD_CVV')
-        const postalEl = elements.create('CARD_POSTAL_CODE')
-        const mountAndCatch = (el: CloverElement, id: string) => {
-          try {
-            const node = document.getElementById(id)
-            if (node) {
-              el.mount(`#${id}`)
-            } else {
-              console.warn(`Element with id "${id}" not found for Clover hosted field`)
-            }
-          } catch (error) {
-            console.error(`Failed to mount Clover element "${id}":`, error)
-          }
-        }
-        mountAndCatch(numberEl, 'card-number')
-        mountAndCatch(dateEl, 'card-date')
-        mountAndCatch(cvvEl, 'card-cvv')
-        mountAndCatch(postalEl, 'card-postal-code')
-        ;(window as unknown as { cloverCreateToken?: () => Promise<string> }).cloverCreateToken = async (): Promise<string> => {
-          const result = await clover.createToken()
-          if (result?.errors) throw new Error('Tokenization failed')
-          const token = (result?.token?.id || result?.token || result?.id) as string
-          if (!token) throw new Error('Missing token from Clover')
-          return token
-        }
-        setHostedReady(true)
-        setForceManual(false)
-      } catch (e) {
-        setTokenError(e instanceof Error ? e.message : 'Failed to initialize Clover hosted fields')
-        setForceManual(true)
-      }
-    }
+	const cloverRef = useRef<CloverSDK | null>(null)
+	const fieldsRef = useRef<{ elements: Record<CloverFieldType, CloverElement>; destroy: () => void } | null>(null)
 
-    const existing = document.querySelector(`script[src=\"${cloverJsUrl}\"]`)
-    if (existing) {
-      onLoaded()
-      return
-    }
-    const script = document.createElement('script')
-    script.src = cloverJsUrl
-    script.async = true
-    script.onload = onLoaded
-    script.onerror = () => { 
-      setTokenError('Failed to load Clover hosted fields script')
-      setForceManual(true)
-    }
-    document.head.appendChild(script)
-    return () => {
-      script.onload = null
-      script.onerror = null
-    }
-  }, [useHostedFields, cloverJsUrl])
+	// Load Clover SDK on mount
+	useEffect(() => {
+		let mounted = true
 
-  // Timeout fallback: switch to manual entry if hosted fields don't become ready
-  useEffect(() => {
-    if (!useHostedFields || hostedReady || forceManual) return
-    const t = setTimeout(() => {
-      if (!hostedReady) {
-        setTokenError((prev) => prev || 'Hosted fields timed out, using secure manual entry')
-        setForceManual(true)
-      }
-    }, 7000)
-    return () => clearTimeout(t)
-  }, [useHostedFields, hostedReady, forceManual])
-  const [cardData, setCardData] = useState<CreditCard>({
-    number: '',
-    expiryMonth: '',
-    expiryYear: '',
-    cvv: '',
-    name: ''
-  })
+		async function loadSDK() {
+			try {
+				const config = getCloverConfig()
+				await loadCloverSDK(config.environment)
+				
+				if (!mounted) return
 
-  const [isTokenizing, setIsTokenizing] = useState(false)
-  const [tokenError, setTokenError] = useState<string>('')
+				setIsSDKLoaded(true)
+			} catch (error) {
+				if (!mounted) return
+				
+				const message = error instanceof Error ? error.message : 'Failed to load payment system'
+				setTokenError(message)
+				console.error('Clover SDK load error:', error)
+			}
+		}
 
-  const submitPayment = async () => {
-    if (isLoading || isTokenizing) return
+		loadSDK()
 
-    // Basic client-side guard before tokenization
-    const sanitizedNumber = cardData.number.replace(/\D/g, '')
-    const rawMonth = cardData.expiryMonth.replace(/\D/g, '')
-    const rawYear = cardData.expiryYear.replace(/\D/g, '')
-    const monthTwoDigits = rawMonth.padStart(2, '0')
-    const yearTwoDigits = rawYear.padStart(2, '0')
-    const cvvDigits = cardData.cvv.replace(/\D/g, '')
+		return () => {
+			mounted = false
+		}
+	}, [])
 
-    const monthValid = /^(0[1-9]|1[0-2])$/.test(monthTwoDigits)
-    const yearValid = /^\d{2}$/.test(yearTwoDigits)
-    const numberLengthValid = sanitizedNumber.length >= 13 && sanitizedNumber.length <= 19
-    const luhnValid = luhnCheck(sanitizedNumber)
-    const cvvValid = cvvDigits.length >= 3
-    const nameValid = cardData.name.trim().length > 0
+	// Initialize Clover and create hosted fields when SDK is loaded
+	useEffect(() => {
+		if (!isSDKLoaded) return
+		if (fieldsRef.current) return // Already initialized
 
-    const hasValidBasics =
-      numberLengthValid && monthValid && yearValid && cvvValid && nameValid && luhnValid
+		let mounted = true
 
-    if (!hasValidBasics) {
-      setTokenError('Please enter complete and valid card details')
-      return
-    }
+		async function initializeFields() {
+			try {
+				const config = getCloverConfig()
+				const clover = initializeClover(config)
+				
+				if (!mounted) return
 
-    try {
-      // Tokenize: prefer hosted fields when enabled and ready; gracefully
-      // fall back to server tokenization if hosted fields are unavailable
-      let token: string
-      if (useHostedFields) {
-        try {
-          if (!hostedReady) throw new Error('Hosted fields not ready')
-          token = await tokenizeHosted()
-        } catch {
-          token = await tokenizeCard({
-            ...cardData,
-            expiryMonth: monthTwoDigits,
-            expiryYear: yearTwoDigits,
-            number: sanitizedNumber,
-          })
-        }
-      } else {
-        token = await tokenizeCard({
-          ...cardData,
-          expiryMonth: monthTwoDigits,
-          expiryYear: yearTwoDigits,
-          number: sanitizedNumber,
-        })
-      }
+				cloverRef.current = clover
 
-      // Ensure billing address is provided
-      if (!billingAddress) {
-        setTokenError('Billing address is required')
-        return
-      }
+				// Wait for DOM elements to be ready
+				await new Promise(resolve => setTimeout(resolve, 100))
 
-      // Prepare payment info
-      const paymentInfo: PaymentInfo = {
-        paymentMethod: 'card',
-        token: token,
-        billingAddress: billingAddress,
-        sameAsShipping: sameAsShipping
-      }
+				const handleFieldChange = (fieldType: CloverFieldType, event: CloverFieldEvent) => {
+					if (!mounted) return
 
-      // Submit payment info
-      await onSubmit(paymentInfo)
+					// Map field type to state key
+					const fieldMap: Record<CloverFieldType, keyof FieldState> = {
+						'CARD_NUMBER': 'cardNumber',
+						'CARD_DATE': 'cardDate',
+						'CARD_CVV': 'cardCvv',
+						'CARD_POSTAL_CODE': 'cardPostal',
+					}
 
-      // Clear sensitive card data after successful submission
-      setCardData({
-        number: '',
-        expiryMonth: '',
-        expiryYear: '',
-        cvv: '',
-        name: ''
-      })
+					const stateKey = fieldMap[fieldType]
+					
+					setFieldStates(prev => ({
+						...prev,
+						[stateKey]: event.complete && !event.error,
+					}))
 
-    } catch (error) {
-      console.error('Payment submission error:', error)
-    }
-  }
+					// Clear error when user starts typing
+					if (tokenError) {
+						setTokenError('')
+					}
+				}
 
-  function luhnCheck(value: string): boolean {
-    if (!value) return false
-    let sum = 0
-    let shouldDouble = false
-    for (let i = value.length - 1; i >= 0; i--) {
-      let digit = parseInt(value.charAt(i), 10)
-      if (Number.isNaN(digit)) return false
-      if (shouldDouble) {
-        digit *= 2
-        if (digit > 9) digit -= 9
-      }
-      sum += digit
-      shouldDouble = !shouldDouble
-    }
-    return sum % 10 === 0
-  }
+				const fields = createHostedFields(clover, handleFieldChange)
+				
+				if (!mounted) return
 
-  // Expose submit function to parent only once
-  useEffect(() => {
-    if (onPaymentReady) {
-      onPaymentReady(submitPayment)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+				fieldsRef.current = fields
+				setIsFieldsReady(true)
 
-  // Minimal types for Clover SDK to avoid any
-  type CloverElement = { mount: (selector: string) => void }
-  type CloverElements = { create: (type: 'CARD_NUMBER'|'CARD_DATE'|'CARD_CVV'|'CARD_POSTAL_CODE') => CloverElement }
-  type CloverInstance = { elements: () => CloverElements; createToken: () => Promise<{ token?: { id?: string }, id?: string, errors?: unknown }> }
-  type CloverCtor = new (key: string, opts: { merchantId: string }) => CloverInstance
+			} catch (error) {
+				if (!mounted) return
+				
+				const message = error instanceof Error ? error.message : 'Failed to initialize payment fields'
+				setTokenError(message)
+				console.error('Clover initialization error:', error)
+			}
+		}
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    await submitPayment()
-  }
+		initializeFields()
 
-  const handleCardFieldChange = (field: keyof CreditCard, value: string) => {
-    let formattedValue = value
+		return () => {
+			mounted = false
+			if (fieldsRef.current) {
+				fieldsRef.current.destroy()
+				fieldsRef.current = null
+			}
+		}
+	}, [isSDKLoaded, tokenError])
 
-    // Format card number
-    if (field === 'number') {
-      formattedValue = formatCreditCardNumber(value)
-    }
+	// Tokenize and submit payment
+	const submitPayment = async () => {
+		if (isLoading || isTokenizing || !isFieldsReady) return
 
-    // Format expiry date
-    if (field === 'expiryMonth' || field === 'expiryYear') {
-      if (field === 'expiryMonth') {
-        // Ensure month is zero-padded and valid
-        const month = value.replace(/\D/g, '').slice(0, 2)
-        if (month.length === 1) {
-          // Auto zero-pad single digits except for 1 which could become 10,11,12
-          if (parseInt(month) > 1) {
-            formattedValue = '0' + month
-          } else {
-            formattedValue = month
-          }
-        } else if (month.length === 2) {
-          if (parseInt(month) > 12) {
-            formattedValue = '12'
-          } else if (parseInt(month) === 0) {
-            formattedValue = '01'
-          } else {
-            formattedValue = month
-          }
-        } else {
-          formattedValue = month
-        }
-      } else {
-        // Year field - only allow 2 digits
-        formattedValue = value.replace(/\D/g, '').slice(0, 2)
-      }
-    }
+		// Validate all fields are complete
+		if (!validateFields(fieldStates)) {
+			setTokenError('Please complete all payment fields')
+			return
+		}
 
-    // Format CVV
-    if (field === 'cvv') {
-      formattedValue = value.replace(/\D/g, '').slice(0, 4)
-    }
+		// Validate cardholder name
+		if (!cardholderName.trim()) {
+			setTokenError('Cardholder name is required')
+			return
+		}
 
-    setCardData(prev => ({
-      ...prev,
-      [field]: formattedValue
-    }))
+		// Ensure billing address is provided
+		if (!billingAddress) {
+			setTokenError('Billing address is required')
+			return
+		}
 
-    // Clear any existing token error when user types without causing loops
-    if (tokenError) setTokenError('')
-  }
+		setIsTokenizing(true)
+		setTokenError('')
 
-  const tokenizeCard = async (card: CreditCard): Promise<string> => {
-    setIsTokenizing(true)
-    setTokenError('')
+		try {
+			if (!cloverRef.current) {
+				throw new Error('Payment system not initialized')
+			}
 
-    try {
-      const response = await fetch('/api/payment/tokenize', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          number: card.number.replace(/\s/g, ''),
-          exp_month: card.expiryMonth.padStart(2, '0'),
-          exp_year: card.expiryYear.padStart(2, '0'),
-          cvv: card.cvv,
-          name: card.name,
-        }),
-      })
+			// Tokenize using Clover hosted fields (card data NEVER touches your server)
+			const token = await tokenizePayment(cloverRef.current)
 
-      const result = await response.json()
+			// Prepare payment info with only the secure token
+			const paymentInfo: PaymentInfo = {
+				paymentMethod: 'card',
+				token: token,
+				billingAddress: billingAddress,
+				sameAsShipping: sameAsShipping
+			}
 
-      if (!response.ok) {
-        throw new Error(result.message || result.error || 'Failed to process payment information')
-      }
+			// Submit payment info to your server
+			await onSubmit(paymentInfo)
 
-      if (!result.success || !result.token?.id) {
-        throw new Error('Invalid tokenization response')
-      }
+			// Clear cardholder name after successful submission
+			setCardholderName('')
+			setFieldStates({
+				cardNumber: false,
+				cardDate: false,
+				cardCvv: false,
+				cardPostal: false,
+			})
 
-      return result.token.id
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to process payment information'
-      setTokenError(errorMessage)
-      throw error
-    } finally {
-      setIsTokenizing(false)
-    }
-  }
+		} catch (error) {
+			const message = error instanceof Error ? error.message : 'Failed to process payment'
+			setTokenError(message)
+			console.error('Payment submission error:', error)
+		} finally {
+			setIsTokenizing(false)
+		}
+	}
 
-  // Hosted fields tokenization (requires proper Clover JS integration)
-  const tokenizeHosted = async (): Promise<string> => {
-    setIsTokenizing(true)
-    setTokenError('')
-    try {
-      // Expect a global hosted fields integration to expose a tokenization function.
-      // Replace this with Clover's actual SDK call when configured, e.g.,
-      // const { token } = await window.Clover.cardForm.createToken()
-      const anyWindow = window as unknown as { cloverCreateToken?: () => Promise<{ id: string }> }
-      if (!anyWindow.cloverCreateToken) {
-        throw new Error('Clover hosted fields not initialized')
-      }
-      const result = await anyWindow.cloverCreateToken()
-      if (!result?.id) throw new Error('Invalid token response from hosted fields')
-      return result.id
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Hosted fields tokenization failed'
-      setTokenError(msg)
-      throw err
-    } finally {
-      setIsTokenizing(false)
-    }
-  }
+	// Expose submit function to parent
+	useEffect(() => {
+		if (onPaymentReady && isFieldsReady) {
+			onPaymentReady(submitPayment)
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [isFieldsReady, onPaymentReady])
 
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault()
+		await submitPayment()
+	}
 
-  const getCardBrand = (number: string): string => {
-    const num = number.replace(/\s/g, '')
-    if (/^4/.test(num)) return 'Visa'
-    if (/^5[1-5]/.test(num)) return 'Mastercard'
-    if (/^3[47]/.test(num)) return 'American Express'
-    if (/^6/.test(num)) return 'Discover'
-    return ''
-  }
+	const isFormValid = validateFields(fieldStates) && cardholderName.trim().length > 0
 
-  const cardBrand = getCardBrand(cardData.number)
-  const isFormValid = cardData.number.replace(/\s/g, '').length >= 13 &&
-                      cardData.expiryMonth &&
-                      cardData.expiryYear &&
-                      cardData.cvv.length >= 3 &&
-                      cardData.name.trim()
+	return (
+		<div className="bg-white rounded-2xl p-8 shadow-soft">
+			<div className="mb-6">
+				<h2 className="font-playfair text-2xl text-brand-dark mb-2">
+					Payment Information
+				</h2>
+				<p className="text-brand-brown">
+					Your payment information is secure and encrypted. Card data never touches our servers.
+				</p>
+			</div>
 
-  return (
-    <div className="bg-white rounded-2xl p-8 shadow-soft">
-      <div className="mb-6">
-        <h2 className="font-playfair text-2xl text-brand-dark mb-2">
-          Payment Information
-        </h2>
-        <p className="text-brand-brown">
-          Your payment information is secure and encrypted.
-        </p>
-      </div>
+			<form onSubmit={handleSubmit} className="space-y-6">
+				{/* Loading State */}
+				{!isSDKLoaded && (
+					<div className="flex items-center justify-center py-8">
+						<div className="text-center">
+							<div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-brand-brown mb-2"></div>
+							<p className="text-sm text-brand-brown">Loading secure payment system...</p>
+						</div>
+					</div>
+				)}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {useHostedFields && !forceManual ? (
-          <>
-            <div className="mb-4">
-              <p className="text-sm text-brand-brown mb-2">Secure Card Entry</p>
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs text-brand-brown mb-1">Card Number</label>
-                  <div id="card-number" className="border rounded-lg px-3 py-2 h-12 bg-brand-beige/30" />
-                </div>
-                <div>
-                  <label className="block text-xs text-brand-brown mb-1">Expiration</label>
-                  <div id="card-date" className="border rounded-lg px-3 py-2 h-12 bg-brand-beige/30" />
-                </div>
-                <div>
-                  <label className="block text-xs text-brand-brown mb-1">CVV</label>
-                  <div id="card-cvv" className="border rounded-lg px-3 py-2 h-12 bg-brand-beige/30" />
-                </div>
-                <div>
-                  <label className="block text-xs text-brand-brown mb-1">Postal Code</label>
-                  <div id="card-postal-code" className="border rounded-lg px-3 py-2 h-12 bg-brand-beige/30" />
-                </div>
-              </div>
-              {!hostedReady && (
-                <p className="text-xs text-brand-brown mt-2">Loading secure card fields…</p>
-              )}
-            </div>
-          </>
-        ) : (
-          <>
-            {/* Card Number */}
-            <div className="relative">
-              <FormField
-                label="Card Number"
-                name="cardNumber"
-                placeholder="1234 5678 9012 3456"
-                value={cardData.number}
-                onChange={(value) => handleCardFieldChange('number', value)}
-                error={errors.cardNumber}
-                required
-              />
-              {cardBrand && (
-                <div className="absolute right-3 top-10 text-sm text-brand-brown font-medium">
-                  {cardBrand}
-                </div>
-              )}
-            </div>
+				{/* Secure Hosted Fields */}
+				{isSDKLoaded && (
+					<>
+						<div className="space-y-4">
+							<p className="text-sm font-medium text-brand-brown mb-4">🔒 Secure Card Entry (PCI Compliant)</p>
+							
+							<div className="grid md:grid-cols-2 gap-4">
+								<div className="md:col-span-2">
+									<label className={CLOVER_FIELD_STYLES.label}>
+										Card Number
+									</label>
+									<div 
+										id="card-number" 
+										className={CLOVER_FIELD_STYLES.container}
+										style={{ minHeight: '48px' }}
+									/>
+								</div>
+								
+								<div>
+									<label className={CLOVER_FIELD_STYLES.label}>
+										Expiration Date
+									</label>
+									<div 
+										id="card-date" 
+										className={CLOVER_FIELD_STYLES.container}
+										style={{ minHeight: '48px' }}
+									/>
+								</div>
+								
+								<div>
+									<label className={CLOVER_FIELD_STYLES.label}>
+										CVV
+									</label>
+									<div 
+										id="card-cvv" 
+										className={CLOVER_FIELD_STYLES.container}
+										style={{ minHeight: '48px' }}
+									/>
+								</div>
+								
+								<div className="md:col-span-2">
+									<label className={CLOVER_FIELD_STYLES.label}>
+										Billing Postal Code
+									</label>
+									<div 
+										id="card-postal" 
+										className={CLOVER_FIELD_STYLES.container}
+										style={{ minHeight: '48px' }}
+									/>
+								</div>
+							</div>
 
-            {/* Expiry and CVV */}
-            <div className="grid grid-cols-3 gap-4">
-              <FormField
-                label="Month"
-                name="expiryMonth"
-                placeholder="MM"
-                value={cardData.expiryMonth}
-                onChange={(value) => handleCardFieldChange('expiryMonth', value)}
-                error={errors.expiryMonth}
-                required
-              />
-              
-              <FormField
-                label="Year"
-                name="expiryYear"
-                placeholder="YY"
-                value={cardData.expiryYear}
-                onChange={(value) => handleCardFieldChange('expiryYear', value)}
-                error={errors.expiryYear}
-                required
-              />
+							{!isFieldsReady && isSDKLoaded && (
+								<p className="text-xs text-brand-brown">Initializing secure payment fields...</p>
+							)}
+						</div>
 
-              <FormField
-                label="CVV"
-                name="cvv"
-                placeholder="123"
-                value={cardData.cvv}
-                onChange={(value) => handleCardFieldChange('cvv', value)}
-                error={errors.cvv}
-                required
-              />
-            </div>
-          </>
-        )}
+						{/* Cardholder Name - only non-sensitive field we collect */}
+						<FormField
+							label="Cardholder Name"
+							name="cardholderName"
+							placeholder="John Doe"
+							value={cardholderName}
+							onChange={(value) => setCardholderName(value)}
+							error={errors.cardholderName}
+							required
+						/>
+					</>
+				)}
 
-        {/* Cardholder Name (shown for both hosted and manual) */}
-        <FormField
-          label="Cardholder Name"
-          name="cardholderName"
-          placeholder="John Doe"
-          value={cardData.name}
-          onChange={(value) => handleCardFieldChange('name', value)}
-          error={errors.cardholderName}
-          required
-        />
+				{/* Billing Address Toggle */}
+				<div className="pt-4 border-t border-brand-brown/20">
+					<div className="flex items-start gap-3">
+						<input
+							id="sameAsShipping"
+							name="sameAsShipping"
+							type="checkbox"
+							checked={sameAsShipping}
+							onChange={(e) => onSameAsShippingChange?.(e.target.checked)}
+							className="mt-1 w-4 h-4 text-brand-brown bg-white border-brand-brown/30 rounded focus:ring-brand-brown/50 focus:ring-2"
+						/>
+						<label 
+							htmlFor="sameAsShipping"
+							className="text-sm text-brand-brown leading-relaxed cursor-pointer"
+						>
+							Billing address same as shipping address
+						</label>
+					</div>
+				</div>
 
-        {/* Billing Address Toggle */}
-        <div className="pt-4 border-t border-brand-brown/20">
-          <div className="flex items-start gap-3">
-            <input
-              id="sameAsShipping"
-              name="sameAsShipping"
-              type="checkbox"
-              checked={sameAsShipping}
-              onChange={(e) => onSameAsShippingChange?.(e.target.checked)}
-              className="mt-1 w-4 h-4 text-brand-brown bg-white border-brand-brown/30 rounded focus:ring-brand-brown/50 focus:ring-2"
-            />
-            <label 
-              htmlFor="sameAsShipping"
-              className="text-sm text-brand-brown leading-relaxed cursor-pointer"
-            >
-              Billing address same as shipping address
-            </label>
-          </div>
-        </div>
+				{/* Error Display */}
+				{tokenError && (
+					<div className="bg-red-50 border border-red-200 rounded-lg p-4">
+						<p className="text-red-600 text-sm">{tokenError}</p>
+					</div>
+				)}
 
-        {/* Error Display */}
-        {tokenError && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <p className="text-red-600 text-sm">{tokenError}</p>
-          </div>
-        )}
+				{/* Security Notice */}
+				<div className="bg-green-50 border border-green-200 rounded-lg p-4">
+					<div className="flex items-start gap-3 text-green-800">
+						<span className="text-xl">✓</span>
+						<div>
+							<p className="text-sm font-semibold mb-1">PCI Compliant Secure Payment</p>
+							<p className="text-xs text-green-700">
+								Your card information is encrypted and tokenized directly by Clover. 
+								Card data never passes through our servers, ensuring maximum security.
+							</p>
+						</div>
+					</div>
+				</div>
 
-        {/* Security Notice */}
-        <div className="bg-brand-beige rounded-lg p-4">
-          <div className="flex items-center gap-2 text-brand-dark">
-            <span className="text-lg">🔒</span>
-            <div>
-              <p className="text-sm font-medium">Secure Payment</p>
-              <p className="text-xs text-brand-brown">
-                Your card information is encrypted and secure. We never store your card details.
-              </p>
-            </div>
-          </div>
-        </div>
+				{/* Test Card Helper (Development Only) */}
+				{process.env.NODE_ENV === 'development' && (
+					<div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+						<h4 className="text-sm font-medium text-blue-800 mb-2">💳 Test Cards (Development)</h4>
+						<div className="text-xs text-blue-700 space-y-1">
+							<p><strong>Visa:</strong> 4005 5192 0000 0004</p>
+							<p><strong>Mastercard:</strong> 5496 9810 0000 0000</p>
+							<p><em>Use any future date for expiry, any 3-digit CVV, any postal code</em></p>
+						</div>
+					</div>
+				)}
 
-        {/* Test Card Helper (Development Only) */}
-        {!useHostedFields && process.env.NODE_ENV === 'development' && (
-          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <h4 className="text-sm font-medium text-blue-800 mb-2">💳 Test Cards (Development)</h4>
-            <div className="text-xs text-blue-700 space-y-1">
-              <p><strong>Successful:</strong> 4005 5192 0000 0004</p>
-              <p><strong>Declined:</strong> 4000 0000 0000 0002</p>
-              <p><em>Use any future date for expiry, any CVV</em></p>
-            </div>
-          </div>
-        )}
-
-        {/* Submit Button - conditionally shown */}
-        {showSubmitButton && (
-          <Button
-            type="submit"
-            variant="primary"
-            size="lg"
-            disabled={!isFormValid || isLoading || isTokenizing}
-            ariaLabel="Complete payment and place order"
-            className="w-full"
-          >
-            {isTokenizing ? 'Securing Payment...' : isLoading ? 'Processing...' : 'Complete Order'}
-          </Button>
-        )}
-      </form>
-    </div>
-  )
+				{/* Submit Button */}
+				{showSubmitButton && (
+					<Button
+						type="submit"
+						variant="primary"
+						size="lg"
+						disabled={!isFormValid || isLoading || isTokenizing || !isFieldsReady}
+						ariaLabel="Complete payment and place order"
+						className="w-full"
+					>
+						{isTokenizing ? 'Securing Payment...' : isLoading ? 'Processing...' : 'Complete Order'}
+					</Button>
+				)}
+			</form>
+		</div>
+	)
 }

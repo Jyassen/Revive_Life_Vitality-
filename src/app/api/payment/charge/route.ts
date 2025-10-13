@@ -89,6 +89,19 @@ export async function POST(request: NextRequest) {
 
     const order = await clover.createOrder(orderRequest)
 
+    // Audit log for successful payment
+    console.info('AUDIT_LOG', {
+      event: 'PAYMENT_PROCESSED',
+      timestamp: new Date().toISOString(),
+      chargeId: charge.id,
+      orderId: order.id,
+      amount: summary.total,
+      currency: 'USD',
+      status: 'succeeded',
+      paymentBrand: charge.source.brand,
+      last4: charge.source.last4,
+    })
+
     // Return success response
     return NextResponse.json({
       success: true,
@@ -111,11 +124,27 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Payment processing error:', error)
+    // Sanitize error logging - never log tokens, card data, or full request bodies
+    const sanitizedError = {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      code: error instanceof CloverAPIError ? error.status : 500,
+      timestamp: new Date().toISOString(),
+      type: error instanceof CloverAPIError ? 'CloverAPIError' : 'UnknownError',
+    }
+    console.error('Payment processing error:', sanitizedError)
 
     if (error instanceof CloverAPIError) {
       // Handle specific Clover API errors
       const errorMessage = getCloverErrorMessage(error)
+      
+      // Audit log for failed payment
+      console.info('AUDIT_LOG', {
+        event: 'PAYMENT_FAILED',
+        timestamp: new Date().toISOString(),
+        errorCode: error.details && typeof error.details === 'object' && 'code' in error.details ? (error.details as { code: string }).code : undefined,
+        statusCode: error.status,
+      })
+      
       return NextResponse.json(
         { 
           error: 'Payment processing failed', 

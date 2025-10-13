@@ -109,6 +109,21 @@ export class CloverAPI {
     if (!this.apiKey) {
       throw new Error('Clover API key is not configured')
     }
+
+    // Validate API key format
+    if (!this.apiKey.startsWith('sk_')) {
+      throw new Error('Invalid Clover API key format. Must start with sk_')
+    }
+
+    // Ensure environment match between key and config
+    const keyEnvironment = this.apiKey.includes('sandbox') ? 'sandbox' : 'production'
+    const configEnvironment = CLOVER_CONFIG.baseURL.includes('sandbox') ? 'sandbox' : 'production'
+    
+    if (keyEnvironment !== configEnvironment) {
+      throw new Error(
+        `Clover API key environment mismatch. Key is for ${keyEnvironment} but environment is set to ${configEnvironment}`
+      )
+    }
   }
 
   private async makeRequest<T>(
