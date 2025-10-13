@@ -33,9 +33,10 @@ const rateLimitStore = new Map<string, { count: number; resetAt: number }>()
  * Get client identifier for rate limiting
  */
 function getClientId(request: NextRequest): string {
-	// Use IP address or a combination of factors
+	// Use IP address from headers (Vercel/serverless environments)
 	const forwarded = request.headers.get('x-forwarded-for')
-	const ip = forwarded ? forwarded.split(',')[0] : request.ip || 'unknown'
+	const realIp = request.headers.get('x-real-ip')
+	const ip = forwarded ? forwarded.split(',')[0].trim() : realIp || 'unknown'
 	return ip
 }
 
