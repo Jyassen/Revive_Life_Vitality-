@@ -47,9 +47,14 @@ export async function POST(request: NextRequest) {
 		const stripe = getStripeInstance()
 
 		// Retrieve the subscription to verify payment was successful
+		type ExpandedSubscription = Stripe.Subscription & {
+			current_period_end: number
+			created: number
+		}
+		
 		const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
 			expand: ['latest_invoice.payment_intent.payment_method'],
-		})
+		}) as ExpandedSubscription
 
 		// Verify subscription is active (payment succeeded)
 		if (subscription.status !== 'active' && subscription.status !== 'trialing') {
@@ -129,15 +134,15 @@ export async function POST(request: NextRequest) {
 			amount: priceAmount / 100,
 			currency: currency.toUpperCase(),
 			billingInterval: `${intervalCount} ${interval}(s)`,
-			currentPeriodEnd: new Date((subscription.current_period_end || 0) * 1000).toISOString(),
+			currentPeriodEnd: new Date(subscription.current_period_end * 1000).toISOString(),
 			paymentMethod: paymentDetails,
 			subscription: {
 				id: subscription.id,
 				status: subscription.status,
 				customer: customer,
 				shippingAddress: shippingAddress,
-				createdAt: new Date((subscription.created || 0) * 1000).toISOString(),
-				currentPeriodEnd: new Date((subscription.current_period_end || 0) * 1000).toISOString(),
+				createdAt: new Date(subscription.created * 1000).toISOString(),
+				currentPeriodEnd: new Date(subscription.current_period_end * 1000).toISOString(),
 			}
 		})
 
