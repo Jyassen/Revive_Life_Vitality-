@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { StripeAPI, getStripeInstance, formatCustomerForStripe, formatAddressForStripe } from '@/lib/stripe'
 import { z } from 'zod'
+import Stripe from 'stripe'
 
 // Request validation schema for subscription
 const createSubscriptionSchema = z.object({
