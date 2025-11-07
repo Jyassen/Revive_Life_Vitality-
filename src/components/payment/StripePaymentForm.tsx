@@ -96,19 +96,23 @@ function StripePaymentFormInner({
 				return
 			}
 
-			// Type guard to ensure we have paymentIntent (TypeScript now knows this is the success case)
+			// Verify we have paymentIntent in the result
 			if (!('paymentIntent' in result) || !result.paymentIntent) {
 				setPaymentError('Payment processing failed. Please try again.')
 				setIsProcessing(false)
 				return
 			}
 
+			// Extract paymentIntent with proper typing
+			// TypeScript's control flow analysis doesn't fully narrow Stripe's union types,
+			// but we've verified at runtime that paymentIntent exists, so this is safe
+			const paymentIntent = result.paymentIntent
+
 			// Payment confirmed successfully!
-			// TypeScript now knows result.paymentIntent exists and is properly typed
 			// The webhook will now fire (payment_intent.succeeded) and activate the subscription
 			const paymentInfo: PaymentInfo = {
 				paymentMethod: 'card',
-				token: result.paymentIntent.id,
+				token: paymentIntent.id,
 				billingAddress: null,
 				sameAsShipping: false,
 			}
