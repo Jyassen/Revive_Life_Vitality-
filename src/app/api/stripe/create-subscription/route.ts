@@ -88,21 +88,29 @@ export async function POST(request: NextRequest) {
 			throw new Error('Subscription created but no invoice found')
 		}
 
-		// Finalize the invoice to create the payment intent
-		// The invoice starts as a draft - we need to finalize it to generate the payment intent
+		// Retrieve the full invoice with payment_intent expanded
+		// Stripe auto-finalizes the invoice when creating subscription with payment_behavior: 'default_incomplete'
 		type ExpandedInvoice = Stripe.Invoice & {
 			payment_intent?: Stripe.PaymentIntent
+			status?: string
 		}
 		
-		const finalizedInvoice = await stripe.invoices.finalizeInvoice(invoice.id, {
+		let fullInvoice = await stripe.invoices.retrieve(invoice.id, {
 			expand: ['payment_intent'],
 		}) as unknown as ExpandedInvoice
 
+		// If invoice is still in draft, finalize it to create payment intent
+		if (fullInvoice.status === 'draft') {
+			fullInvoice = await stripe.invoices.finalizeInvoice(invoice.id, {
+				expand: ['payment_intent'],
+			}) as unknown as ExpandedInvoice
+		}
+
 		// Extract the payment intent
-		const paymentIntent = finalizedInvoice.payment_intent
+		const paymentIntent = fullInvoice.payment_intent
 		
 		if (!paymentIntent?.client_secret) {
-			throw new Error('Payment intent not found after finalizing invoice')
+			throw new Error('Payment intent not found on invoice')
 		}
 
 		const clientSecret = paymentIntent.client_secret
