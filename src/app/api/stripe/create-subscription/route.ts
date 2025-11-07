@@ -80,17 +80,30 @@ export async function POST(request: NextRequest) {
 		})
 
 		// Get the payment intent from the subscription's latest invoice
-		const latestInvoice = subscription.latest_invoice
-		let clientSecret = null
+		const latestInvoice = subscription.latest_invoice as any
+		let clientSecret: string | null = null
 
-		if (latestInvoice && typeof latestInvoice === 'object' && 'payment_intent' in latestInvoice) {
-			const paymentIntent = latestInvoice.payment_intent
-			if (paymentIntent && typeof paymentIntent === 'object' && 'client_secret' in paymentIntent) {
-				clientSecret = paymentIntent.client_secret
+		// Debug log to see what we're getting
+		console.log('Latest invoice type:', typeof latestInvoice)
+		console.log('Latest invoice object:', latestInvoice?.id)
+		
+		if (latestInvoice && typeof latestInvoice === 'object') {
+			const paymentIntent = latestInvoice.payment_intent as any
+			console.log('Payment intent type:', typeof paymentIntent)
+			console.log('Payment intent object:', paymentIntent?.id)
+			
+			if (paymentIntent && typeof paymentIntent === 'object') {
+				clientSecret = paymentIntent.client_secret as string
+				console.log('Client secret found:', !!clientSecret)
 			}
 		}
 
 		if (!clientSecret) {
+			console.error('Failed to extract client secret from subscription:', {
+				subscriptionId: subscription.id,
+				latestInvoiceType: typeof latestInvoice,
+				latestInvoiceId: latestInvoice?.id,
+			})
 			throw new Error('Failed to create payment intent for subscription')
 		}
 
