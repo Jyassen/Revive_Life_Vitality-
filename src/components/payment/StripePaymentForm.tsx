@@ -88,21 +88,23 @@ function StripePaymentFormInner({
 				// This will redirect for Cash App, Klarna, bank redirects, etc.
 			})
 
-			// Check for errors
-			if (result.error) {
+			// Handle errors using proper type guard
+			// Stripe returns a discriminated union: { error: StripeError } | { paymentIntent: PaymentIntent }
+			if ('error' in result && result.error) {
 				setPaymentError(handleStripeError(result.error))
 				setIsProcessing(false)
 				return
 			}
 
-			// TypeScript needs explicit confirmation that paymentIntent exists
-			if (!result.paymentIntent) {
+			// Type guard to ensure we have paymentIntent (TypeScript now knows this is the success case)
+			if (!('paymentIntent' in result) || !result.paymentIntent) {
 				setPaymentError('Payment processing failed. Please try again.')
 				setIsProcessing(false)
 				return
 			}
 
 			// Payment confirmed successfully!
+			// TypeScript now knows result.paymentIntent exists and is properly typed
 			// The webhook will now fire (payment_intent.succeeded) and activate the subscription
 			const paymentInfo: PaymentInfo = {
 				paymentMethod: 'card',
