@@ -83,6 +83,11 @@ function ProcessingContent() {
 		setMessage('Subscription activation is taking longer than expected. Please check your email for confirmation.')
 	}, [router])
 
+	// Scroll to top on mount
+	useEffect(() => {
+		window.scrollTo({ top: 0, behavior: 'instant' })
+	}, [])
+
 	useEffect(() => {
 		if (!stripe) {
 			return
