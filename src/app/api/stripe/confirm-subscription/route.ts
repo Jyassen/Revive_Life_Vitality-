@@ -71,10 +71,16 @@ export async function POST(request: NextRequest) {
 			)
 		}
 
-		// Extract payment method details from the payment intent
-		const invoice = subscription.latest_invoice as Stripe.Invoice
-		const paymentIntent = invoice?.payment_intent as Stripe.PaymentIntent
-		const paymentMethod = paymentIntent?.payment_method as Stripe.PaymentMethod
+		// Extract payment method details from the expanded invoice
+		type ExpandedInvoice = Stripe.Invoice & {
+			payment_intent?: Stripe.PaymentIntent & {
+				payment_method?: Stripe.PaymentMethod
+			}
+		}
+		
+		const invoice = subscription.latest_invoice as ExpandedInvoice
+		const paymentIntent = invoice?.payment_intent
+		const paymentMethod = paymentIntent?.payment_method
 		const card = paymentMethod?.card
 		
 		const paymentDetails = {

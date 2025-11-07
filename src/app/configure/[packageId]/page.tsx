@@ -110,7 +110,6 @@ export default function ConfigurePackagePage() {
     setSelectedProducts(prev => {
       const newQuantity = Math.max(0, (prev[productId] || 0) + change)
       if (newQuantity === 0) {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { [productId]: _, ...rest } = prev
         return rest
       }
