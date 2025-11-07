@@ -16,7 +16,7 @@ const createPaymentIntentSchema = z.object({
 		lastName: z.string(),
 		email: z.string().email(),
 		phone: z.string().optional(),
-		marketingConsent: z.boolean().optional(),
+		marketingConsent: z.boolean().default(false),
 	}),
 	summary: z.object({
 		subtotal: z.number(),

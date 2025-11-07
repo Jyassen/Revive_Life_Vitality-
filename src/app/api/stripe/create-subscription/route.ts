@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { StripeAPI, formatCustomerForStripe, formatAddressForStripe } from '@/lib/stripe'
+import { StripeAPI, getStripeInstance, formatCustomerForStripe, formatAddressForStripe } from '@/lib/stripe'
 import { z } from 'zod'
 
 // Request validation schema for subscription
@@ -10,7 +10,7 @@ const createSubscriptionSchema = z.object({
 		lastName: z.string(),
 		email: z.string().email(),
 		phone: z.string().optional(),
-		marketingConsent: z.boolean().optional(),
+		marketingConsent: z.boolean().default(false),
 	}),
 	shippingAddress: z.object({
 		firstName: z.string(),
@@ -45,11 +45,12 @@ export async function POST(request: NextRequest) {
 		const { priceId, customer, shippingAddress, metadata, trialPeriodDays } = validationResult.data
 
 		// Initialize Stripe API
-		const stripe = new StripeAPI()
+		const stripeAPI = new StripeAPI()
+		const stripe = getStripeInstance()
 
 		// Create or retrieve customer
 		const customerData = formatCustomerForStripe(customer)
-		const stripeCustomer = await stripe.createCustomer({
+		const stripeCustomer = await stripeAPI.createCustomer({
 			email: customerData.email,
 			name: customerData.name,
 			phone: customerData.phone,
@@ -61,7 +62,7 @@ export async function POST(request: NextRequest) {
 		})
 
 		// Create subscription
-		const subscription = await stripe.stripe.subscriptions.create({
+		const subscription = await stripe.subscriptions.create({
 			customer: stripeCustomer.id,
 			items: [{ price: priceId }],
 			payment_behavior: 'default_incomplete',

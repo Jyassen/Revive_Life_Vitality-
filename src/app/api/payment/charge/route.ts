@@ -29,6 +29,17 @@ export async function POST(request: NextRequest) {
       couponCode
     } = validationResult.data
 
+    // Validate payment token is provided
+    if (!paymentToken) {
+      return NextResponse.json(
+        { 
+          error: 'Payment token required', 
+          message: 'Payment token is required for Clover payment processing'
+        },
+        { status: 400 }
+      )
+    }
+
     // Initialize Clover API
     const clover = new CloverAPI()
 

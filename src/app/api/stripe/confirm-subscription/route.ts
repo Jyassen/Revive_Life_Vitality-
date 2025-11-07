@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { StripeAPI, StripeAPIError, getStripeErrorMessage } from '@/lib/stripe'
+import { getStripeInstance, StripeAPIError, getStripeErrorMessage } from '@/lib/stripe'
 import { z } from 'zod'
+import Stripe from 'stripe'
 
 // Request validation schema
 const confirmSubscriptionSchema = z.object({
@@ -40,15 +41,18 @@ export async function POST(request: NextRequest) {
 			)
 		}
 
-		const { subscriptionId, customerId, customer, shippingAddress } = validationResult.data
+		const { subscriptionId, customer, shippingAddress } = validationResult.data
 
-		// Initialize Stripe API
-		const stripe = new StripeAPI()
+		// Initialize Stripe instance
+		const stripe = getStripeInstance()
 
 		// Retrieve the subscription to verify its status
-		const subscription = await stripe.stripe.subscriptions.retrieve(subscriptionId, {
+		const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
 			expand: ['latest_invoice.payment_intent'],
-		})
+		}) as unknown as Stripe.Subscription & {
+			current_period_end: number
+			created: number
+		}
 
 		// Check subscription status
 		if (subscription.status !== 'active' && subscription.status !== 'trialing') {

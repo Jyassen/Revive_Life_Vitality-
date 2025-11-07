@@ -6,7 +6,7 @@ export const STRIPE_CONFIG = {
 	publishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '',
 	secretKey: process.env.STRIPE_SECRET_KEY || '',
 	webhookSecret: process.env.STRIPE_WEBHOOK_SECRET || '',
-	apiVersion: '2024-11-20.acacia' as const,
+	apiVersion: '2025-10-29.clover' as const,
 } as const
 
 // Initialize Stripe instance (server-side only)
@@ -99,7 +99,9 @@ export class StripeAPI {
 					enabled: true,
 				},
 				description: request.description,
-				metadata: request.metadata as Record<string, string>,
+				...(request.metadata && {
+					metadata: request.metadata as unknown as Record<string, string>,
+				}),
 				...(request.customerEmail && {
 					receipt_email: request.customerEmail,
 				}),

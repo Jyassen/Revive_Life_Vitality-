@@ -12,11 +12,13 @@ import Image from 'next/image'
 import { customerInfoSchema, addressSchema, OrderSummary, PaymentInfo } from '@/lib/validations/checkout'
 
 interface CheckoutFormData {
+	// Customer Info
 	firstName: string
 	lastName: string
 	email: string
 	phone: string
 	marketingConsent: boolean
+	// Shipping Address
 	shippingFirstName: string
 	shippingLastName: string
 	address1: string
@@ -25,26 +27,8 @@ interface CheckoutFormData {
 	state: string
 	zipCode: string
 	country: string
+	// Additional fields
 	specialInstructions: string
-}
-
-interface CartItem {
-	id: string
-	name: string
-	price: string
-	quantity: number
-	image?: string
-	recurring?: boolean
-	type?: string
-}
-
-// Helper function to detect if item is a subscription
-function isSubscriptionItem(item: CartItem): boolean {
-	// Check if item has subscription metadata or specific product name
-	return item.name?.toLowerCase().includes('club') || 
-	       item.name?.toLowerCase().includes('subscription') ||
-	       item.recurring === true ||
-	       item.type === 'subscription'
 }
 
 function CheckoutContent() {
@@ -67,24 +51,17 @@ function CheckoutContent() {
 	const [currentStep, setCurrentStep] = useState<'info' | 'payment'>('info')
 	const [clientSecret, setClientSecret] = useState<string>('')
 	const [paymentIntentId, setPaymentIntentId] = useState<string>('')
-	const [subscriptionId, setSubscriptionId] = useState<string>('')
-	const [customerId, setCustomerId] = useState<string>('')
-	const [isSubscription, setIsSubscription] = useState(false)
 
 	useEffect(() => {
 		if (items.length === 0) {
 			router.push('/cart')
-		} else {
-			// Detect if this is a subscription checkout
-			const hasSubscription = items.some(item => isSubscriptionItem(item))
-			setIsSubscription(hasSubscription)
 		}
-	}, [items, router])
+	}, [items.length, router])
 
 	// Calculate order summary
 	useEffect(() => {
 		const subtotal = totalPrice
-		const shipping = 10.00
+		const shipping = 10.00 // Flat $10 shipping fee
 		const discount = 0
 		const tax = 0
 		const total = Math.max(0, subtotal - discount) + shipping
@@ -93,12 +70,15 @@ function CheckoutContent() {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [totalPrice])
 
+	// Form state
 	const [formData, setFormData] = useState<CheckoutFormData>({
+		// Customer Info
 		firstName: customerInfo?.firstName || '',
 		lastName: customerInfo?.lastName || '',
 		email: customerInfo?.email || '',
 		phone: customerInfo?.phone || '',
 		marketingConsent: customerInfo?.marketingConsent || false,
+		// Shipping Address
 		shippingFirstName: shippingAddress?.firstName || '',
 		shippingLastName: shippingAddress?.lastName || '',
 		address1: shippingAddress?.address1 || '',
@@ -107,6 +87,7 @@ function CheckoutContent() {
 		state: shippingAddress?.state || '',
 		zipCode: shippingAddress?.zipCode || '',
 		country: shippingAddress?.country || 'US',
+		// Additional fields
 		specialInstructions: ''
 	})
 
@@ -167,6 +148,7 @@ function CheckoutContent() {
 		setFormData((prev: CheckoutFormData) => ({ ...prev, [field]: value }))
 	}
 
+	// Auto-fill shipping name from customer info
 	const copyCustomerNameToShipping = () => {
 		setFormData((prev: CheckoutFormData) => ({
 			...prev,
@@ -175,6 +157,7 @@ function CheckoutContent() {
 		}))
 	}
 
+	// Handle customer and shipping info submission
 	const handleCustomerShippingSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
 		clearErrors()
@@ -182,6 +165,7 @@ function CheckoutContent() {
 		let hasErrors = false
 
 		try {
+			// Validate customer info
 			const customerData = {
 				firstName: formData.firstName,
 				lastName: formData.lastName,
@@ -190,6 +174,7 @@ function CheckoutContent() {
 				marketingConsent: formData.marketingConsent
 			}
 			customerInfoSchema.parse(customerData)
+			
 		} catch (error: unknown) {
 			hasErrors = true
 			if (error && typeof error === 'object' && 'errors' in error) {
@@ -201,6 +186,7 @@ function CheckoutContent() {
 		}
 
 		try {
+			// Validate shipping address
 			const shippingData = {
 				firstName: formData.shippingFirstName || formData.firstName,
 				lastName: formData.shippingLastName || formData.lastName,
@@ -212,12 +198,14 @@ function CheckoutContent() {
 				country: formData.country
 			}
 			addressSchema.parse(shippingData)
+			
 		} catch (error: unknown) {
 			hasErrors = true
 			if (error && typeof error === 'object' && 'errors' in error) {
 				const zodError = error as { errors: Array<{ path: string[]; message: string }> }
 				zodError.errors.forEach((err) => {
 					const fieldPath = err.path[0]
+					// Map shipping address validation errors to correct form field names
 					let errorField = fieldPath
 					if (fieldPath === 'firstName' && !formData.shippingFirstName) {
 						errorField = 'shippingFirstName'
@@ -230,6 +218,7 @@ function CheckoutContent() {
 		}
 
 		if (!hasErrors) {
+			// Save validated data to context
 			const customerData = {
 				firstName: formData.firstName,
 				lastName: formData.lastName,
@@ -251,16 +240,12 @@ function CheckoutContent() {
 			setCustomerInfo(customerData)
 			setShippingAddress(shippingData)
 
-			// Create appropriate payment flow
-			if (isSubscription) {
-				await createSubscription(customerData, shippingData)
-			} else {
-				await createPaymentIntent(customerData, shippingData)
-			}
+			// Create Payment Intent
+			await createPaymentIntent(customerData, shippingData)
 		}
 	}
 
-	// Create Payment Intent for one-time purchase
+	// Create Payment Intent with Stripe
 	const createPaymentIntent = async (customerData: typeof customerInfo, _shippingData: typeof shippingAddress) => {
 		try {
 			setLoading(true)
@@ -301,80 +286,29 @@ function CheckoutContent() {
 		}
 	}
 
-	// Create Subscription for recurring purchase
-	const createSubscription = async (customerData: typeof customerInfo, shippingData: typeof shippingAddress) => {
-		try {
-			setLoading(true)
-			
-			// You'll need to pass the Stripe Price ID from your product catalog
-			// For Revive Club, you'll get this from your Stripe dashboard
-			const priceId = 'price_REVIVE_CLUB_WEEKLY' // Replace with actual Price ID
-
-			const response = await fetch('/api/stripe/create-subscription', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					priceId: priceId,
-					customer: customerData,
-					shippingAddress: shippingData,
-					metadata: {
-						product_name: items[0]?.name || 'Revive Club',
-						special_instructions: formData.specialInstructions || '',
-					},
-				}),
-			})
-
-			const data = await response.json()
-
-			if (!response.ok || !data?.clientSecret) {
-				setError('payment', data?.error || data?.message || 'Unable to initialize subscription')
-				return
-			}
-
-			setClientSecret(data.clientSecret)
-			setSubscriptionId(data.subscriptionId)
-			setCustomerId(data.customerId)
-			setCurrentStep('payment')
-
-		} catch (error) {
-			console.error('Subscription creation error:', error)
-			setError('payment', 'Failed to initialize subscription. Please try again.')
-		} finally {
-			setLoading(false)
-		}
-	}
-
-	// Handle payment submission (works for both one-time and subscription)
+	// Handle payment submission
 	const handlePaymentSubmit = async (_paymentInfo: PaymentInfo) => {
 		try {
 			setLoading(true)
 			clearErrors()
 
-			const endpoint = isSubscription ? '/api/stripe/confirm-subscription' : '/api/stripe/confirm-payment'
-			const payload = isSubscription ? {
-				subscriptionId: subscriptionId,
-				customerId: customerId,
-				customer: customerInfo,
-				shippingAddress: shippingAddress,
-			} : {
-				paymentIntentId: paymentIntentId,
-				items: items.map(i => ({
-					id: i.id,
-					name: i.name,
-					price: parseFloat(i.price.replace('$', '')),
-					quantity: i.quantity,
-					image: i.image,
-				})),
-				customer: customerInfo,
-				shippingAddress: shippingAddress,
-				summary: orderSummary,
-				specialInstructions: formData.specialInstructions || undefined,
-			}
-
-			const response = await fetch(endpoint, {
+			const response = await fetch('/api/stripe/confirm-payment', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(payload),
+				body: JSON.stringify({
+					paymentIntentId: paymentIntentId,
+					items: items.map(i => ({
+						id: i.id,
+						name: i.name,
+						price: parseFloat(i.price.replace('$', '')),
+						quantity: i.quantity,
+						image: i.image,
+					})),
+					customer: customerInfo,
+					shippingAddress: shippingAddress,
+					summary: orderSummary,
+					specialInstructions: formData.specialInstructions || undefined,
+				}),
 			})
 
 			const data = await response.json()
@@ -386,7 +320,7 @@ function CheckoutContent() {
 
 			// Success! Clear cart and redirect
 			clearCart()
-			router.push(`/checkout/success?order_id=${data.orderId || data.subscriptionId}${isSubscription ? '&subscription=true' : ''}`)
+			router.push(`/checkout/success?order_id=${data.orderId}`)
 
 		} catch (error) {
 			console.error('Payment confirmation error:', error)
@@ -427,21 +361,13 @@ function CheckoutContent() {
 						</div>
 					</div>
 
-					{/* Subscription Badge */}
-					{isSubscription && (
-						<div className="mb-6 text-center">
-							<div className="inline-block bg-brand-green text-white px-4 py-2 rounded-full text-sm font-medium">
-								🔄 Weekly Subscription - Cancel Anytime
-							</div>
-						</div>
-					)}
-
 					<div className="grid lg:grid-cols-3 gap-12">
 						{/* Checkout Form */}
 						<div className="lg:col-span-2">
+							{/* Step 1: Customer & Shipping Info */}
 							{currentStep === 'info' && (
 								<form onSubmit={handleCustomerShippingSubmit} className="space-y-8">
-									{/* Contact Information */}
+									{/* Contact Information Section */}
 									<div className="bg-white rounded-2xl p-8 shadow-soft">
 										<div className="mb-6">
 											<h2 className="font-playfair text-2xl text-brand-dark mb-2">
@@ -499,6 +425,7 @@ function CheckoutContent() {
 											/>
 										</div>
 
+										{/* Marketing Consent */}
 										<div className="flex items-start gap-3 pt-2">
 											<input
 												id="marketingConsent"
@@ -518,7 +445,7 @@ function CheckoutContent() {
 										</div>
 									</div>
 
-									{/* Shipping Address - rest of form stays the same... */}
+									{/* Shipping Address Section */}
 									<div className="bg-white rounded-2xl p-8 shadow-soft">
 										<div className="mb-6">
 											<h2 className="font-playfair text-2xl text-brand-dark mb-2">
@@ -551,6 +478,7 @@ function CheckoutContent() {
 											/>
 										</div>
 
+										{/* Quick fill button */}
 										{formData.firstName && formData.lastName && (
 											<div className="mb-4">
 												<button
@@ -617,6 +545,35 @@ function CheckoutContent() {
 												/>
 											</div>
 										</div>
+
+										{/* Shipping Notice */}
+										<div className="mt-6 bg-brand-beige rounded-lg p-4 border-l-4 border-brand-green">
+											<p className="text-sm text-brand-dark">
+												Your order will be carefully packaged to maintain freshness and quality.
+											</p>
+										</div>
+									</div>
+
+									{/* Special Instructions Section */}
+									<div className="bg-white rounded-2xl p-8 shadow-soft">
+										<div className="mb-6">
+											<h2 className="font-playfair text-2xl text-brand-dark mb-2">
+												Special Instructions
+											</h2>
+											<p className="text-brand-brown">
+												Any special delivery instructions or notes for us?
+											</p>
+										</div>
+
+										<FormField
+											label="Delivery Instructions"
+											name="specialInstructions"
+											type="textarea"
+											placeholder="Leave at front door, ring doorbell, etc. (optional)"
+											value={formData.specialInstructions}
+											onChange={(value) => handleInputChange('specialInstructions', value)}
+											rows={3}
+										/>
 									</div>
 
 									{/* Continue Button */}
@@ -633,6 +590,7 @@ function CheckoutContent() {
 										</Button>
 									</div>
 
+									{/* Error Display */}
 									{errors.payment && (
 										<div className="bg-red-50 border border-red-200 rounded-lg p-4">
 											<p className="text-red-600 text-sm">{errors.payment}</p>
@@ -641,9 +599,10 @@ function CheckoutContent() {
 								</form>
 							)}
 
-							{/* Payment Step */}
+							{/* Step 2: Payment */}
 							{currentStep === 'payment' && clientSecret && (
 								<div className="space-y-8">
+									{/* Back Button */}
 									<button
 										onClick={() => setCurrentStep('info')}
 										className="text-brand-brown hover:text-brand-dark flex items-center gap-2 mb-4"
@@ -670,6 +629,7 @@ function CheckoutContent() {
 									Order Summary
 								</h2>
 
+								{/* Cart Items */}
 								<div className="space-y-4 mb-6">
 									{items.map((item) => (
 										<div key={item.id} className="border-b border-brand-brown/10 pb-4 last:border-b-0">
@@ -687,28 +647,25 @@ function CheckoutContent() {
 													<h3 className="font-medium text-sm text-brand-dark mb-1">
 														{item.name}
 													</h3>
-													{isSubscription && (
-														<p className="text-xs text-brand-green mb-1">
-															🔄 Weekly Subscription
-														</p>
-													)}
 													<p className="text-xs text-brand-brown mb-1">
 														Qty: {item.quantity}
 													</p>
 													<p className="text-sm font-medium text-brand-dark">
 														${(parseFloat(item.price.replace('$', '')) * item.quantity).toFixed(2)}
-														{isSubscription && <span className="text-xs">/week</span>}
 													</p>
 												</div>
 											</div>
+											
+											{/* Show package configuration details if it's a configured package */}
 											<ConfiguredPackageDisplay item={item} />
 										</div>
 									))}
 								</div>
 
+								{/* Order Totals */}
 								<div className="space-y-3 pt-6 border-t border-brand-brown/20">
 									<div className="flex justify-between text-brand-dark">
-										<span>Subtotal</span>
+										<span>Subtotal ({items.reduce((sum, item) => sum + item.quantity, 0)} items)</span>
 										<span>${orderSummary?.subtotal.toFixed(2) || totalPrice.toFixed(2)}</span>
 									</div>
 
@@ -720,24 +677,12 @@ function CheckoutContent() {
 									<div className="border-t border-brand-brown/20 pt-3">
 										<div className="flex justify-between text-xl font-medium text-brand-dark">
 											<span>Total</span>
-											<span>
-												${orderSummary?.total.toFixed(2) || (totalPrice + 10).toFixed(2)}
-												{isSubscription && <span className="text-sm">/week</span>}
-											</span>
+											<span>${orderSummary?.total.toFixed(2) || (totalPrice + 10).toFixed(2)}</span>
 										</div>
 									</div>
-
-									{isSubscription && (
-										<div className="mt-4 p-3 bg-brand-beige rounded-lg">
-											<p className="text-xs text-brand-dark">
-												✓ Cancel anytime<br/>
-												✓ Pause or skip deliveries<br/>
-												✓ Save 10% vs one-time purchases
-											</p>
-										</div>
-									)}
 								</div>
 
+								{/* Security Badge */}
 								<div className="mt-6 pt-6 border-t border-brand-brown/20 text-center">
 									<p className="text-xs text-brand-brown">
 										🔒 Secured by Stripe - Industry standard encryption

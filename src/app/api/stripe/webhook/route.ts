@@ -344,15 +344,20 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
  * Handle invoice payment succeeded (recurring payment)
  */
 async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
+	const invoiceData = invoice as Stripe.Invoice & { 
+		subscription?: string | Stripe.Subscription
+		billing_reason?: string
+	}
+	
 	console.info('AUDIT_LOG', {
 		event: 'INVOICE_PAYMENT_SUCCEEDED',
 		timestamp: new Date().toISOString(),
 		invoiceId: invoice.id,
-		subscriptionId: invoice.subscription as string,
+		subscriptionId: typeof invoiceData.subscription === 'string' ? invoiceData.subscription : invoiceData.subscription?.id,
 		customerId: invoice.customer as string,
 		amount: invoice.amount_paid / 100,
 		currency: invoice.currency.toUpperCase(),
-		billingReason: invoice.billing_reason,
+		billingReason: invoiceData.billing_reason,
 	})
 
 	// TODO: Implement your business logic here:
@@ -374,15 +379,20 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
  * Handle invoice payment failed (recurring payment failure)
  */
 async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
+	const invoiceData = invoice as Stripe.Invoice & { 
+		subscription?: string | Stripe.Subscription
+		attempt_count?: number
+	}
+	
 	console.warn('AUDIT_LOG', {
 		event: 'INVOICE_PAYMENT_FAILED',
 		timestamp: new Date().toISOString(),
 		invoiceId: invoice.id,
-		subscriptionId: invoice.subscription as string,
+		subscriptionId: typeof invoiceData.subscription === 'string' ? invoiceData.subscription : invoiceData.subscription?.id,
 		customerId: invoice.customer as string,
 		amount: invoice.amount_due / 100,
 		currency: invoice.currency.toUpperCase(),
-		attemptCount: invoice.attempt_count,
+		attemptCount: invoiceData.attempt_count,
 	})
 
 	// TODO: Implement your business logic here:

@@ -1,0 +1,37 @@
+# ============================================
+# COPY THESE LINES TO YOUR .env.local FILE
+# ============================================
+# Add these to your existing .env.local file (don't delete what's already there!)
+
+# Stripe API Keys
+# Get from: https://dashboard.stripe.com/test/apikeys
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_
+STRIPE_SECRET_KEY=sk_test_
+
+# Stripe Webhook Secret (optional for development, required for production)
+# Get from Stripe CLI or dashboard webhooks
+STRIPE_WEBHOOK_SECRET=whsec_
+
+# Revive Club Subscription Price ID
+# Get from: https://dashboard.stripe.com/test/products → Click "Revive Club" → Copy Price ID
+NEXT_PUBLIC_REVIVE_CLUB_PRICE_ID=price_
+
+# Feature Flag - Use embedded Stripe checkout (not payment links)
+NEXT_PUBLIC_USE_PAYMENT_LINKS=false
+
+
+# ============================================
+# INSTRUCTIONS:
+# ============================================
+# 1. Open your existing .env.local file
+# 2. Scroll to the bottom
+# 3. Copy the lines above (starting from NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
+# 4. Paste them at the bottom of your .env.local file
+# 5. Fill in the actual values (replace everything after the = sign)
+# 6. Save the file
+# 7. Restart your dev server (npm run dev)
+#
+# Keep all your existing environment variables!
+# These are just additions for Stripe integration.
+# ============================================
+

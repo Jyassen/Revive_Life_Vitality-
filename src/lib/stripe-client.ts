@@ -1,6 +1,6 @@
 'use client'
 
-import { loadStripe, Stripe, StripeElements, StripeElementsOptions } from '@stripe/stripe-js'
+import { loadStripe, Stripe, StripeElementsOptions } from '@stripe/stripe-js'
 import { STRIPE_CONFIG } from './stripe'
 
 let stripePromise: Promise<Stripe | null> | null = null
@@ -87,11 +87,14 @@ export function createElementsOptions(
 /**
  * Handle Stripe confirmation errors
  */
-export function handleStripeError(error: { type: string; message: string }): string {
-	switch (error.type) {
+export function handleStripeError(error: { type?: string; message?: string }): string {
+	const errorType = error.type || 'unknown'
+	const errorMessage = error.message || 'An unexpected error occurred.'
+	
+	switch (errorType) {
 		case 'card_error':
 		case 'validation_error':
-			return error.message
+			return errorMessage
 		case 'invalid_request_error':
 			return 'Invalid payment request. Please refresh and try again.'
 		case 'api_error':
