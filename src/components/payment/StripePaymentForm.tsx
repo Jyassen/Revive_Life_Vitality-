@@ -7,6 +7,7 @@ import {
 	useElements,
 	Elements,
 } from '@stripe/react-stripe-js'
+import type { PaymentIntent } from '@stripe/stripe-js'
 import { getStripe, handleStripeError } from '@/lib/stripe-client'
 import { PaymentInfo } from '@/lib/validations/checkout'
 import Button from '@/components/ui/Button'
@@ -103,10 +104,10 @@ function StripePaymentFormInner({
 				return
 			}
 
-			// Extract paymentIntent with proper typing
-			// TypeScript's control flow analysis doesn't fully narrow Stripe's union types,
-			// but we've verified at runtime that paymentIntent exists, so this is safe
-			const paymentIntent = result.paymentIntent
+		// Extract paymentIntent with proper typing
+		// TypeScript's control flow analysis doesn't fully narrow Stripe's union types,
+		// but we've verified at runtime that paymentIntent exists, so this is safe
+		const paymentIntent = result.paymentIntent as PaymentIntent
 
 			// Payment confirmed successfully!
 			// The webhook will now fire (payment_intent.succeeded) and activate the subscription
