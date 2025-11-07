@@ -95,11 +95,18 @@ function StripePaymentFormInner({
 				return
 			}
 
+			// TypeScript needs explicit confirmation that paymentIntent exists
+			if (!result.paymentIntent) {
+				setPaymentError('Payment processing failed. Please try again.')
+				setIsProcessing(false)
+				return
+			}
+
 			// Payment confirmed successfully!
 			// The webhook will now fire (payment_intent.succeeded) and activate the subscription
 			const paymentInfo: PaymentInfo = {
 				paymentMethod: 'card',
-				token: result.paymentIntent?.id || '',
+				token: result.paymentIntent.id,
 				billingAddress: null,
 				sameAsShipping: false,
 			}
