@@ -61,7 +61,8 @@ export async function POST(request: NextRequest) {
 			},
 		})
 
-		// Create subscription with proper payment intent setup
+		// Create subscription with incomplete status
+		// This creates the subscription and invoice but doesn't charge yet
 		const subscription = await stripe.subscriptions.create({
 			customer: stripeCustomer.id,
 			items: [{ price: priceId }],
@@ -70,7 +71,7 @@ export async function POST(request: NextRequest) {
 				payment_method_types: ['card'],
 				save_default_payment_method: 'on_subscription',
 			},
-			expand: ['latest_invoice.payment_intent', 'pending_setup_intent'],
+			expand: ['latest_invoice'],
 			metadata: {
 				...metadata,
 				customer_name: customerData.name,
@@ -79,52 +80,27 @@ export async function POST(request: NextRequest) {
 			...(trialPeriodDays && { trial_period_days: trialPeriodDays }),
 		})
 
-		// Get the client secret - check both payment_intent and setup_intent
-		const latestInvoice = subscription.latest_invoice as any
-		const pendingSetupIntent = subscription.pending_setup_intent as any
-		let clientSecret: string | null = null
-
-		// First try to get payment intent from invoice
-		if (latestInvoice && typeof latestInvoice === 'object') {
-			const paymentIntent = latestInvoice.payment_intent as any
-			if (paymentIntent && typeof paymentIntent === 'object' && paymentIntent.client_secret) {
-				clientSecret = paymentIntent.client_secret as string
-				console.log('Using payment intent client secret')
-			}
+		// Extract invoice ID from the subscription
+		const invoice = subscription.latest_invoice as Stripe.Invoice
+		
+		if (!invoice?.id) {
+			throw new Error('Subscription created but no invoice found')
 		}
 
-		// If no payment intent, check for setup intent
-		if (!clientSecret && pendingSetupIntent && typeof pendingSetupIntent === 'object') {
-			if (pendingSetupIntent.client_secret) {
-				clientSecret = pendingSetupIntent.client_secret as string
-				console.log('Using setup intent client secret')
-			}
+		// Retrieve the invoice with payment_intent expanded
+		// This is the proper way to get the payment intent for a subscription's first payment
+		const fullInvoice = await stripe.invoices.retrieve(invoice.id, {
+			expand: ['payment_intent'],
+		})
+
+		// Extract the payment intent
+		const paymentIntent = fullInvoice.payment_intent as Stripe.PaymentIntent | null
+		
+		if (!paymentIntent?.client_secret) {
+			throw new Error('Payment intent not created for subscription invoice')
 		}
 
-		// If still no client secret, we need to manually retrieve/create the payment intent
-		if (!clientSecret && latestInvoice?.id) {
-			console.log('Retrieving invoice to get payment intent...')
-			const invoice = await stripe.invoices.retrieve(latestInvoice.id, {
-				expand: ['payment_intent'],
-			})
-			
-			const paymentIntent = invoice.payment_intent as any
-			if (paymentIntent && typeof paymentIntent === 'object' && paymentIntent.client_secret) {
-				clientSecret = paymentIntent.client_secret as string
-				console.log('Retrieved payment intent from invoice')
-			}
-		}
-
-		if (!clientSecret) {
-			console.error('Failed to extract client secret from subscription:', {
-				subscriptionId: subscription.id,
-				subscriptionStatus: subscription.status,
-				latestInvoiceId: latestInvoice?.id,
-				latestInvoiceStatus: latestInvoice?.status,
-				hasPendingSetupIntent: !!pendingSetupIntent,
-			})
-			throw new Error('Failed to get client secret for subscription payment')
-		}
+		const clientSecret = paymentIntent.client_secret
 
 		// Audit log for subscription creation
 		console.info('AUDIT_LOG', {

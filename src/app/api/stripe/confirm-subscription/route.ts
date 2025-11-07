@@ -46,15 +46,12 @@ export async function POST(request: NextRequest) {
 		// Initialize Stripe instance
 		const stripe = getStripeInstance()
 
-		// Retrieve the subscription to verify its status
+		// Retrieve the subscription to verify payment was successful
 		const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
-			expand: ['latest_invoice.payment_intent'],
-		}) as unknown as Stripe.Subscription & {
-			current_period_end: number
-			created: number
-		}
+			expand: ['latest_invoice.payment_intent.payment_method'],
+		})
 
-		// Check subscription status
+		// Verify subscription is active (payment succeeded)
 		if (subscription.status !== 'active' && subscription.status !== 'trialing') {
 			console.warn('AUDIT_LOG', {
 				event: 'SUBSCRIPTION_NOT_ACTIVE',
@@ -74,25 +71,15 @@ export async function POST(request: NextRequest) {
 			)
 		}
 
-		// Get payment method details
-		const latestInvoice = subscription.latest_invoice
-		let paymentDetails = {
-			brand: 'card',
-			last4: '****',
-		}
-
-		if (latestInvoice && typeof latestInvoice === 'object' && 'payment_intent' in latestInvoice) {
-			const paymentIntent = latestInvoice.payment_intent
-			if (paymentIntent && typeof paymentIntent === 'object') {
-				const paymentMethod = 'payment_method' in paymentIntent ? paymentIntent.payment_method : null
-				if (paymentMethod && typeof paymentMethod === 'object' && 'card' in paymentMethod) {
-					const card = paymentMethod.card as { brand?: string; last4?: string }
-					paymentDetails = {
-						brand: card.brand || 'card',
-						last4: card.last4 || '****',
-					}
-				}
-			}
+		// Extract payment method details from the payment intent
+		const invoice = subscription.latest_invoice as Stripe.Invoice
+		const paymentIntent = invoice?.payment_intent as Stripe.PaymentIntent
+		const paymentMethod = paymentIntent?.payment_method as Stripe.PaymentMethod
+		const card = paymentMethod?.card
+		
+		const paymentDetails = {
+			brand: card?.brand || 'card',
+			last4: card?.last4 || '****',
 		}
 
 		// Create order reference
@@ -104,12 +91,17 @@ export async function POST(request: NextRequest) {
 		const interval = subscription.items.data[0]?.price?.recurring?.interval || 'week'
 		const intervalCount = subscription.items.data[0]?.price?.recurring?.interval_count || 1
 
+		// Extract customer ID
+		const customerId = typeof subscription.customer === 'string' 
+			? subscription.customer 
+			: subscription.customer?.id || ''
+
 		// Audit log for successful subscription activation
 		console.info('AUDIT_LOG', {
 			event: 'SUBSCRIPTION_ACTIVATED',
 			timestamp: new Date().toISOString(),
 			subscriptionId: subscription.id,
-			customerId: subscription.customer as string,
+			customerId,
 			orderId,
 			amount: priceAmount / 100,
 			currency: currency.toUpperCase(),
@@ -121,24 +113,25 @@ export async function POST(request: NextRequest) {
 		})
 
 		// Return success response
+
 		return NextResponse.json({
 			success: true,
 			orderId,
 			subscriptionId: subscription.id,
-			customerId: subscription.customer as string,
+			customerId,
 			status: subscription.status,
 			amount: priceAmount / 100,
 			currency: currency.toUpperCase(),
 			billingInterval: `${intervalCount} ${interval}(s)`,
-			currentPeriodEnd: new Date(subscription.current_period_end * 1000).toISOString(),
+			currentPeriodEnd: new Date((subscription.current_period_end || 0) * 1000).toISOString(),
 			paymentMethod: paymentDetails,
 			subscription: {
 				id: subscription.id,
 				status: subscription.status,
 				customer: customer,
 				shippingAddress: shippingAddress,
-				createdAt: new Date(subscription.created * 1000).toISOString(),
-				currentPeriodEnd: new Date(subscription.current_period_end * 1000).toISOString(),
+				createdAt: new Date((subscription.created || 0) * 1000).toISOString(),
+				currentPeriodEnd: new Date((subscription.current_period_end || 0) * 1000).toISOString(),
 			}
 		})
 
