@@ -307,7 +307,7 @@ function CheckoutContent() {
 			setLoading(true)
 			
 			// Get Price ID from environment variable or use placeholder for development
-			const priceId = process.env.NEXT_PUBLIC_STRIPE_REVIVE_CLUB_PRICE_ID || 'price_REVIVE_CLUB_WEEKLY'
+			const priceId = process.env.NEXT_PUBLIC_REVIVE_CLUB_PRICE_ID || 'price_REVIVE_CLUB_WEEKLY'
 			
 			if (priceId === 'price_REVIVE_CLUB_WEEKLY') {
 				setError('payment', 'Subscription product not configured. Please contact support.')

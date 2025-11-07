@@ -24,14 +24,14 @@ The checkout shows "Failed to create subscription" because the Stripe Price ID i
 #### For Local Development:
 Add to your `.env.local` file:
 ```bash
-NEXT_PUBLIC_STRIPE_REVIVE_CLUB_PRICE_ID=price_YOUR_ACTUAL_PRICE_ID_HERE
+NEXT_PUBLIC_REVIVE_CLUB_PRICE_ID=price_YOUR_ACTUAL_PRICE_ID_HERE
 ```
 
 #### For Vercel Production:
 1. Go to your Vercel project settings
 2. Navigate to **Environment Variables**
 3. Add new variable:
-   - **Name**: `NEXT_PUBLIC_STRIPE_REVIVE_CLUB_PRICE_ID`
+   - **Name**: `NEXT_PUBLIC_REVIVE_CLUB_PRICE_ID`
    - **Value**: `price_YOUR_ACTUAL_PRICE_ID_HERE`
    - **Environment**: Select **Production**, **Preview**, and **Development**
 4. Click **"Save"**
