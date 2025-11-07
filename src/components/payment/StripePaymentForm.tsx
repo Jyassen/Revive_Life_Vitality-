@@ -79,7 +79,7 @@ function StripePaymentFormInner({
 			// Step 2: Confirm the payment with Stripe
 			// This processes the payment and handles redirects for alternative payment methods
 			// (Cash App, Klarna, etc.) and 3D Secure
-			const { error: confirmError, paymentIntent } = await stripe.confirmPayment({
+			const result = await stripe.confirmPayment({
 				elements,
 				confirmParams: {
 					return_url: `${window.location.origin}/checkout/processing`,
@@ -88,8 +88,9 @@ function StripePaymentFormInner({
 				// This will redirect for Cash App, Klarna, bank redirects, etc.
 			})
 
-			if (confirmError) {
-				setPaymentError(handleStripeError(confirmError))
+			// Check for errors
+			if (result.error) {
+				setPaymentError(handleStripeError(result.error))
 				setIsProcessing(false)
 				return
 			}
@@ -98,7 +99,7 @@ function StripePaymentFormInner({
 			// The webhook will now fire (payment_intent.succeeded) and activate the subscription
 			const paymentInfo: PaymentInfo = {
 				paymentMethod: 'card',
-				token: paymentIntent?.id || '',
+				token: result.paymentIntent?.id || '',
 				billingAddress: null,
 				sameAsShipping: false,
 			}
