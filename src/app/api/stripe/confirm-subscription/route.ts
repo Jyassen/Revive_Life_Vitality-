@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
 		
 		const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
 			expand: ['latest_invoice.payment_intent.payment_method'],
-		}) as ExpandedSubscription
+		}) as unknown as ExpandedSubscription
 
 		// Verify subscription is active (payment succeeded)
 		if (subscription.status !== 'active' && subscription.status !== 'trialing') {
