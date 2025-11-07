@@ -62,12 +62,11 @@ export async function POST(request: NextRequest) {
 			},
 		})
 
-	// Create subscription with incomplete status and expand payment intent
-	// payment_behavior: 'default_incomplete' creates invoice + payment intent but doesn't charge yet
+	// Create subscription with incomplete status
+	// payment_behavior: 'default_incomplete' creates subscription + invoice but NOT payment intent
+	// We need to manually create the payment intent for the invoice
 	type ExpandedSubscription = Stripe.Subscription & {
-		latest_invoice?: Stripe.Invoice & {
-			payment_intent?: Stripe.PaymentIntent
-		}
+		latest_invoice?: Stripe.Invoice
 	}
 
 	const subscription = await stripe.subscriptions.create({
@@ -78,7 +77,7 @@ export async function POST(request: NextRequest) {
 			payment_method_types: ['card'],
 			save_default_payment_method: 'on_subscription',
 		},
-		expand: ['latest_invoice.payment_intent'],
+		expand: ['latest_invoice'],
 		metadata: {
 			...metadata,
 			customer_name: customerData.name,
@@ -87,16 +86,29 @@ export async function POST(request: NextRequest) {
 		...(trialPeriodDays && { trial_period_days: trialPeriodDays }),
 	}) as unknown as ExpandedSubscription
 
-	// Extract payment intent from the expanded subscription
+	// Extract invoice from subscription
 	const invoice = subscription.latest_invoice
-	const paymentIntent = invoice?.payment_intent
 	
-	if (!invoice?.id) {
+	if (!invoice?.id || typeof invoice.id !== 'string') {
 		throw new Error('Subscription created but no invoice found')
 	}
-	
+
+	// Pay the invoice off-session to create the payment intent
+	// Using `off_session: false` creates the payment intent without actually charging
+	// This properly associates the payment intent with the invoice
+	type ExpandedInvoice = Stripe.Invoice & {
+		payment_intent?: Stripe.PaymentIntent
+	}
+
+	const paidInvoice = await stripe.invoices.pay(invoice.id, {
+		off_session: false,
+		expand: ['payment_intent'],
+	}) as unknown as ExpandedInvoice
+
+	const paymentIntent = paidInvoice.payment_intent
+
 	if (!paymentIntent?.client_secret) {
-		throw new Error('Payment intent not found on invoice')
+		throw new Error('Failed to create payment intent for invoice')
 	}
 
 	const clientSecret = paymentIntent.client_secret
