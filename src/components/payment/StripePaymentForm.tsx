@@ -77,13 +77,15 @@ function StripePaymentFormInner({
 			}
 
 			// Step 2: Confirm the payment with Stripe
-			// This actually processes the payment and handles 3D Secure if needed
+			// This processes the payment and handles redirects for alternative payment methods
+			// (Cash App, Klarna, etc.) and 3D Secure
 			const { error: confirmError, paymentIntent } = await stripe.confirmPayment({
 				elements,
 				confirmParams: {
-					return_url: `${window.location.origin}/checkout/success`,
+					return_url: `${window.location.origin}/checkout/processing`,
 				},
-				redirect: 'if_required', // Only redirect if 3D Secure is required
+				// Let Stripe handle redirects automatically for payment methods that need it
+				// This will redirect for Cash App, Klarna, bank redirects, etc.
 			})
 
 			if (confirmError) {

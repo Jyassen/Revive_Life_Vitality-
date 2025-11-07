@@ -108,6 +108,7 @@ export async function POST(request: NextRequest) {
 		metadata: {
 			subscription_id: subscription.id,
 			invoice_id: invoice.id,
+			customer_id: stripeCustomer.id,
 			customer_email: customer.email,
 			...metadata,
 		},
