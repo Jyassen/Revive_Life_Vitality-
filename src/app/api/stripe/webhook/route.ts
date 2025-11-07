@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { StripeAPI, StripeAPIError } from '@/lib/stripe'
+import { StripeAPI, StripeAPIError, getStripeInstance } from '@/lib/stripe'
 import Stripe from 'stripe'
 
 /**
@@ -142,8 +142,7 @@ async function handlePaymentIntentSucceeded(paymentIntent: Stripe.PaymentIntent)
 
 	if (subscriptionId && invoiceId) {
 		try {
-			const stripe = new StripeAPI()
-			const stripeInstance = stripe.getStripeInstance()
+			const stripe = getStripeInstance()
 
 			// Get the payment method from the successful payment intent
 			const paymentMethodId = typeof paymentIntent.payment_method === 'string' 
@@ -161,12 +160,12 @@ async function handlePaymentIntentSucceeded(paymentIntent: Stripe.PaymentIntent)
 			}
 
 			// Update the subscription with the payment method
-			await stripeInstance.subscriptions.update(subscriptionId, {
+			await stripe.subscriptions.update(subscriptionId, {
 				default_payment_method: paymentMethodId,
 			})
 
 			// Pay the invoice with the payment method
-			await stripeInstance.invoices.pay(invoiceId, {
+			await stripe.invoices.pay(invoiceId, {
 				payment_method: paymentMethodId,
 			})
 
