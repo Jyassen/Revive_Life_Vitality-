@@ -29,9 +29,9 @@ export const creditCardSchema = z.object({
 })
 
 export const paymentInfoSchema = z.object({
-  paymentMethod: z.enum(['card'], { required_error: 'Payment method is required' }),
-  token: z.string().min(1, 'Payment token is required'),
-  billingAddress: addressSchema,
+  paymentMethod: z.enum(['card', 'apple_pay', 'google_pay'], { required_error: 'Payment method is required' }),
+  token: z.string().optional(), // Stripe handles payment method directly
+  billingAddress: addressSchema.nullable().optional(), // Stripe collects billing address
   sameAsShipping: z.boolean().default(true)
 })
 
@@ -69,7 +69,8 @@ export const createOrderSchema = z.object({
   customer: customerInfoSchema,
   shippingAddress: addressSchema,
   billingAddress: addressSchema.optional(),
-  paymentToken: z.string().min(1, 'Payment token is required'),
+  paymentToken: z.string().optional(), // Optional for Stripe Payment Intents
+  paymentIntentId: z.string().optional(), // For Stripe Payment Intents
   summary: orderSummarySchema,
   specialInstructions: z.string().max(500).optional(),
   couponCode: z.string().optional()
