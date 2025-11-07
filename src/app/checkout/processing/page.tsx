@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState, useCallback, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useStripe } from '@stripe/react-stripe-js'
 import { Elements } from '@stripe/react-stripe-js'
@@ -213,7 +213,23 @@ export default function ProcessingPage() {
 
 	return (
 		<Elements stripe={stripePromise}>
-			<ProcessingContent />
+			<Suspense fallback={
+				<div className="min-h-screen bg-brand-beige flex items-center justify-center">
+					<div className="container-custom section-padding">
+						<div className="max-w-md mx-auto bg-white rounded-2xl p-8 shadow-soft text-center">
+							<div className="inline-block animate-spin rounded-full h-16 w-16 border-b-4 border-brand-brown mb-4"></div>
+							<h1 className="font-playfair text-2xl text-brand-dark mb-2">
+								Loading...
+							</h1>
+							<p className="text-brand-brown">
+								Please wait while we load the payment processor.
+							</p>
+						</div>
+					</div>
+				</div>
+			}>
+				<ProcessingContent />
+			</Suspense>
 		</Elements>
 	)
 }
