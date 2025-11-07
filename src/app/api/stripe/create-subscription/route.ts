@@ -62,77 +62,63 @@ export async function POST(request: NextRequest) {
 			},
 		})
 
-		// Create subscription with incomplete status
-		// This creates the subscription and invoice but doesn't charge yet
-		const subscription = await stripe.subscriptions.create({
-			customer: stripeCustomer.id,
-			items: [{ price: priceId }],
-			payment_behavior: 'default_incomplete',
-			payment_settings: {
-				payment_method_types: ['card'],
-				save_default_payment_method: 'on_subscription',
-			},
-			expand: ['latest_invoice'],
-			metadata: {
-				...metadata,
-				customer_name: customerData.name,
-				shipping_address: JSON.stringify(shippingAddress),
-			},
-			...(trialPeriodDays && { trial_period_days: trialPeriodDays }),
-		})
-
-		// Extract invoice ID from the subscription
-		const invoice = subscription.latest_invoice as Stripe.Invoice
-		
-		if (!invoice?.id) {
-			throw new Error('Subscription created but no invoice found')
-		}
-
-		// Retrieve the full invoice with payment_intent expanded
-		// Stripe auto-finalizes the invoice when creating subscription with payment_behavior: 'default_incomplete'
-		type ExpandedInvoice = Stripe.Invoice & {
+	// Create subscription with incomplete status and expand payment intent
+	// payment_behavior: 'default_incomplete' creates invoice + payment intent but doesn't charge yet
+	type ExpandedSubscription = Stripe.Subscription & {
+		latest_invoice?: Stripe.Invoice & {
 			payment_intent?: Stripe.PaymentIntent
-			status?: string
 		}
-		
-		let fullInvoice = await stripe.invoices.retrieve(invoice.id, {
-			expand: ['payment_intent'],
-		}) as unknown as ExpandedInvoice
+	}
 
-		// If invoice is still in draft, finalize it to create payment intent
-		if (fullInvoice.status === 'draft') {
-			fullInvoice = await stripe.invoices.finalizeInvoice(invoice.id, {
-				expand: ['payment_intent'],
-			}) as unknown as ExpandedInvoice
-		}
+	const subscription = await stripe.subscriptions.create({
+		customer: stripeCustomer.id,
+		items: [{ price: priceId }],
+		payment_behavior: 'default_incomplete',
+		payment_settings: {
+			payment_method_types: ['card'],
+			save_default_payment_method: 'on_subscription',
+		},
+		expand: ['latest_invoice.payment_intent'],
+		metadata: {
+			...metadata,
+			customer_name: customerData.name,
+			shipping_address: JSON.stringify(shippingAddress),
+		},
+		...(trialPeriodDays && { trial_period_days: trialPeriodDays }),
+	}) as unknown as ExpandedSubscription
 
-		// Extract the payment intent
-		const paymentIntent = fullInvoice.payment_intent
-		
-		if (!paymentIntent?.client_secret) {
-			throw new Error('Payment intent not found on invoice')
-		}
+	// Extract payment intent from the expanded subscription
+	const invoice = subscription.latest_invoice
+	const paymentIntent = invoice?.payment_intent
+	
+	if (!invoice?.id) {
+		throw new Error('Subscription created but no invoice found')
+	}
+	
+	if (!paymentIntent?.client_secret) {
+		throw new Error('Payment intent not found on invoice')
+	}
 
-		const clientSecret = paymentIntent.client_secret
+	const clientSecret = paymentIntent.client_secret
 
-		// Audit log for subscription creation
-		console.info('AUDIT_LOG', {
-			event: 'SUBSCRIPTION_CREATED',
-			timestamp: new Date().toISOString(),
-			subscriptionId: subscription.id,
-			customerId: stripeCustomer.id,
-			priceId: priceId,
-			customerEmail: customer.email,
-			status: subscription.status,
-		})
+	// Audit log for subscription creation
+	console.info('AUDIT_LOG', {
+		event: 'SUBSCRIPTION_CREATED',
+		timestamp: new Date().toISOString(),
+		subscriptionId: subscription.id,
+		customerId: stripeCustomer.id,
+		priceId: priceId,
+		customerEmail: customer.email,
+		status: subscription.status,
+	})
 
-		// Return client secret and subscription details
-		return NextResponse.json({
-			subscriptionId: subscription.id,
-			clientSecret: clientSecret,
-			customerId: stripeCustomer.id,
-			status: subscription.status,
-		})
+	// Return client secret and subscription details
+	return NextResponse.json({
+		subscriptionId: subscription.id,
+		clientSecret: clientSecret,
+		customerId: stripeCustomer.id,
+		status: subscription.status,
+	})
 
 	} catch (error) {
 		// Sanitize error logging
