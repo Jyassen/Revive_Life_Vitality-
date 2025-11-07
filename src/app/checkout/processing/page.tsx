@@ -5,6 +5,16 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useStripe } from '@stripe/react-stripe-js'
 import { Elements } from '@stripe/react-stripe-js'
 import { getStripe } from '@/lib/stripe-client'
+import type { PaymentIntent } from '@stripe/stripe-js'
+
+// Extend PaymentIntent type to include metadata
+interface PaymentIntentWithMetadata extends PaymentIntent {
+	metadata: {
+		subscription_id?: string
+		customer_id?: string
+		[key: string]: string | undefined
+	}
+}
 
 function ProcessingContent() {
 	const stripe = useStripe()
@@ -100,10 +110,9 @@ function ProcessingContent() {
 					setMessage('Payment successful! Activating your subscription...')
 					
 					// Get subscription details from metadata
-					// Cast to any to access metadata which exists but isn't typed
-					const metadata = (paymentIntent as any).metadata || {}
-					const subscriptionId = metadata.subscription_id
-					const customerId = metadata.customer_id
+					const paymentIntentWithMetadata = paymentIntent as PaymentIntentWithMetadata
+					const subscriptionId = paymentIntentWithMetadata.metadata?.subscription_id
+					const customerId = paymentIntentWithMetadata.metadata?.customer_id
 					
 					if (subscriptionId) {
 						// Poll for subscription activation
