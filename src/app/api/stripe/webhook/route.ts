@@ -136,18 +136,65 @@ async function handlePaymentIntentSucceeded(paymentIntent: Stripe.PaymentIntent)
 		metadata: paymentIntent.metadata,
 	})
 
-	// TODO: Implement your business logic here:
+	// Check if this payment is for a subscription's first invoice
+	const subscriptionId = paymentIntent.metadata?.subscription_id
+	const invoiceId = paymentIntent.metadata?.invoice_id
+
+	if (subscriptionId && invoiceId) {
+		try {
+			const stripe = new StripeAPI()
+			const stripeInstance = stripe.getStripeInstance()
+
+			// Get the payment method from the successful payment intent
+			const paymentMethodId = typeof paymentIntent.payment_method === 'string' 
+				? paymentIntent.payment_method 
+				: paymentIntent.payment_method?.id
+
+			if (!paymentMethodId) {
+				console.error('AUDIT_LOG', {
+					event: 'SUBSCRIPTION_PAYMENT_ERROR',
+					timestamp: new Date().toISOString(),
+					error: 'No payment method found on payment intent',
+					paymentIntentId: paymentIntent.id,
+				})
+				return
+			}
+
+			// Update the subscription with the payment method
+			await stripeInstance.subscriptions.update(subscriptionId, {
+				default_payment_method: paymentMethodId,
+			})
+
+			// Pay the invoice with the payment method
+			await stripeInstance.invoices.pay(invoiceId, {
+				payment_method: paymentMethodId,
+			})
+
+			console.info('AUDIT_LOG', {
+				event: 'SUBSCRIPTION_INVOICE_PAID',
+				timestamp: new Date().toISOString(),
+				subscriptionId,
+				invoiceId,
+				paymentIntentId: paymentIntent.id,
+			})
+		} catch (error) {
+			console.error('AUDIT_LOG', {
+				event: 'SUBSCRIPTION_PAYMENT_ERROR',
+				timestamp: new Date().toISOString(),
+				error: error instanceof Error ? error.message : 'Unknown error',
+				subscriptionId,
+				invoiceId,
+				paymentIntentId: paymentIntent.id,
+			})
+		}
+	}
+
+	// TODO: Implement additional business logic here:
 	// 1. Update order status in database
 	// 2. Send confirmation email to customer
 	// 3. Trigger fulfillment process
 	// 4. Update inventory
 	// 5. Send notification to admin
-
-	// Example database update (implement based on your ORM/database):
-	// await db.orders.update({
-	//   where: { paymentIntentId: paymentIntent.id },
-	//   data: { status: 'paid', paidAt: new Date() }
-	// })
 }
 
 /**

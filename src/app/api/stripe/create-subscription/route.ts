@@ -93,22 +93,31 @@ export async function POST(request: NextRequest) {
 		throw new Error('Subscription created but no invoice found')
 	}
 
-	// Pay the invoice off-session to create the payment intent
-	// Using `off_session: false` creates the payment intent without actually charging
-	// This properly associates the payment intent with the invoice
-	type ExpandedInvoice = Stripe.Invoice & {
-		payment_intent?: Stripe.PaymentIntent
+	if (!invoice.amount_due) {
+		throw new Error('Invoice has no amount due')
 	}
 
-	const paidInvoice = await stripe.invoices.pay(invoice.id, {
-		off_session: false,
-		expand: ['payment_intent'],
-	}) as unknown as ExpandedInvoice
+	// Create a payment intent for the invoice amount
+	// We create a standalone payment intent and link it to the subscription/invoice via metadata
+	// When the payment succeeds, we'll handle it in the webhook to update the subscription
+	const paymentIntent = await stripe.paymentIntents.create({
+		amount: invoice.amount_due,
+		currency: invoice.currency || 'usd',
+		customer: stripeCustomer.id,
+		description: `Subscription payment for ${customer.email}`,
+		metadata: {
+			subscription_id: subscription.id,
+			invoice_id: invoice.id,
+			customer_email: customer.email,
+			...metadata,
+		},
+		automatic_payment_methods: {
+			enabled: true,
+		},
+	})
 
-	const paymentIntent = paidInvoice.payment_intent
-
-	if (!paymentIntent?.client_secret) {
-		throw new Error('Failed to create payment intent for invoice')
+	if (!paymentIntent.client_secret) {
+		throw new Error('Failed to create payment intent')
 	}
 
 	const clientSecret = paymentIntent.client_secret
