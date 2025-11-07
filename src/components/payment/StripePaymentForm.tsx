@@ -67,8 +67,7 @@ function StripePaymentFormInner({
 		setPaymentError('')
 
 		try {
-			// Confirm the payment on the client side
-			// This will handle card authentication (3D Secure) if needed
+			// Step 1: Validate the payment form
 			const { error: submitError } = await elements.submit()
 
 			if (submitError) {
@@ -77,16 +76,32 @@ function StripePaymentFormInner({
 				return
 			}
 
-			// Get payment method to pass back
-			// The actual confirmation happens on the server
+			// Step 2: Confirm the payment with Stripe
+			// This actually processes the payment and handles 3D Secure if needed
+			const { error: confirmError, paymentIntent } = await stripe.confirmPayment({
+				elements,
+				confirmParams: {
+					return_url: `${window.location.origin}/checkout/success`,
+				},
+				redirect: 'if_required', // Only redirect if 3D Secure is required
+			})
+
+			if (confirmError) {
+				setPaymentError(handleStripeError(confirmError))
+				setIsProcessing(false)
+				return
+			}
+
+			// Payment confirmed successfully!
+			// The webhook will now fire (payment_intent.succeeded) and activate the subscription
 			const paymentInfo: PaymentInfo = {
 				paymentMethod: 'card',
-				token: '', // Will be handled by Payment Intent
-				billingAddress: null, // Collected by Stripe Payment Element
+				token: paymentIntent?.id || '',
+				billingAddress: null,
 				sameAsShipping: false,
 			}
 
-			// Call parent's onSubmit which will handle server-side confirmation
+			// Step 3: Call parent's onSubmit to verify subscription activation
 			await onSubmit(paymentInfo)
 
 		} catch (error) {
@@ -203,7 +218,7 @@ function StripePaymentFormInner({
 								{isProcessing 
 									? 'Processing Payment...' 
 									: isLoading 
-									? 'Completing Order...' 
+									? 'Activating Subscription...' 
 									: 'Complete Order'}
 							</Button>
 						)}

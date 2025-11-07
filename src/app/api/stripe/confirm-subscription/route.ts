@@ -66,10 +66,25 @@ export async function POST(request: NextRequest) {
 				customerEmail: customer.email,
 			})
 
+			// Provide more helpful error messages based on subscription status
+			let errorMessage = 'Subscription payment was not successful'
+			
+			if (subscription.status === 'incomplete') {
+				errorMessage = 'Your payment is still being processed. This usually takes a few seconds. Please wait...'
+			} else if (subscription.status === 'incomplete_expired') {
+				errorMessage = 'Payment attempt expired. Please try again with a different payment method.'
+			} else if (subscription.status === 'past_due') {
+				errorMessage = 'Payment failed. Please update your payment method and try again.'
+			} else if (subscription.status === 'canceled') {
+				errorMessage = 'This subscription has been canceled. Please start a new subscription.'
+			} else if (subscription.status === 'unpaid') {
+				errorMessage = 'Payment could not be processed. Please try a different payment method.'
+			}
+
 			return NextResponse.json(
 				{ 
 					error: 'Subscription not activated',
-					message: 'Subscription payment was not successful',
+					message: errorMessage,
 					status: subscription.status,
 				},
 				{ status: 402 }

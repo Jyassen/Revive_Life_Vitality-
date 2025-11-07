@@ -70,6 +70,7 @@ function CheckoutContent() {
 	const [subscriptionId, setSubscriptionId] = useState<string>('')
 	const [customerId, setCustomerId] = useState<string>('')
 	const [isSubscription, setIsSubscription] = useState(false)
+	const [loadingMessage, setLoadingMessage] = useState<string>('')
 
 	useEffect(() => {
 		if (items.length === 0) {
@@ -376,22 +377,79 @@ function CheckoutContent() {
 				specialInstructions: formData.specialInstructions || undefined,
 			}
 
-			const response = await fetch(endpoint, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(payload),
-			})
+			// For subscriptions, we need to poll until the webhook activates it
+			if (isSubscription) {
+				let attempts = 0
+				const maxAttempts = 10
+				const baseDelay = 1000 // 1 second
 
-			const data = await response.json()
+				// Initial loading message
+				setLoadingMessage('Processing payment...')
 
-			if (!response.ok) {
-				setError('payment', data?.message || 'Payment failed')
-				return
+				while (attempts < maxAttempts) {
+					// Update loading message based on attempts
+					if (attempts === 0) {
+						setLoadingMessage('Processing payment...')
+					} else if (attempts < 3) {
+						setLoadingMessage('Activating subscription...')
+					} else {
+						setLoadingMessage('Finalizing your subscription...')
+					}
+
+					const response = await fetch(endpoint, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify(payload),
+					})
+
+					const data = await response.json()
+
+					if (response.ok) {
+						// Success! Subscription is now active
+						setLoadingMessage('Success! Redirecting...')
+						clearCart()
+						router.push(`/checkout/success?order_id=${data.orderId || data.subscriptionId}&subscription=true`)
+						return
+					} else if (response.status === 402 && data.status === 'incomplete') {
+						// Subscription is still being processed by webhook
+						// Wait with exponential backoff and retry
+						attempts++
+						if (attempts < maxAttempts) {
+							const delay = baseDelay * Math.pow(1.5, attempts)
+							await new Promise(resolve => setTimeout(resolve, delay))
+							continue
+						} else {
+							// Timeout - webhook might be slow
+							setLoadingMessage('')
+							setError('payment', 'Subscription is being activated. Please check your email for confirmation or refresh this page in a moment.')
+							return
+						}
+					} else {
+						// Other error (not just incomplete status)
+						setLoadingMessage('')
+						setError('payment', data?.message || 'Subscription activation failed')
+						return
+					}
+				}
+			} else {
+				// One-time payment - no polling needed
+				const response = await fetch(endpoint, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(payload),
+				})
+
+				const data = await response.json()
+
+				if (!response.ok) {
+					setError('payment', data?.message || 'Payment failed')
+					return
+				}
+
+				// Success! Clear cart and redirect
+				clearCart()
+				router.push(`/checkout/success?order_id=${data.orderId || data.subscriptionId}`)
 			}
-
-			// Success! Clear cart and redirect
-			clearCart()
-			router.push(`/checkout/success?order_id=${data.orderId || data.subscriptionId}${isSubscription ? '&subscription=true' : ''}`)
 
 		} catch (error) {
 			console.error('Payment confirmation error:', error)
@@ -626,16 +684,16 @@ function CheckoutContent() {
 
 									{/* Continue Button */}
 									<div className="bg-white rounded-2xl p-8 shadow-soft">
-										<Button
-											type="submit"
-											variant="primary"
-											size="lg"
-											disabled={isLoading}
-											ariaLabel="Continue to payment"
-											className="w-full btn-primary text-lg py-4"
-										>
-											{isLoading ? 'Processing...' : 'Continue to Payment'}
-										</Button>
+									<Button
+										type="submit"
+										variant="primary"
+										size="lg"
+										disabled={isLoading}
+										ariaLabel="Continue to payment"
+										className="w-full btn-primary text-lg py-4"
+									>
+										{isLoading ? (loadingMessage || 'Processing...') : 'Continue to Payment'}
+									</Button>
 									</div>
 
 									{errors.payment && (
