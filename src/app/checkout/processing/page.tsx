@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useStripe } from '@stripe/react-stripe-js'
 import { Elements } from '@stripe/react-stripe-js'
@@ -13,75 +13,7 @@ function ProcessingContent() {
 	const [status, setStatus] = useState<'processing' | 'success' | 'error'>('processing')
 	const [message, setMessage] = useState('Processing your payment...')
 
-	useEffect(() => {
-		if (!stripe) {
-			return
-		}
-
-		const clientSecret = searchParams.get('payment_intent_client_secret')
-
-		if (!clientSecret) {
-			setStatus('error')
-			setMessage('Payment information not found. Please try again.')
-			return
-		}
-
-		// Retrieve the PaymentIntent to check its status
-		stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => {
-			if (!paymentIntent) {
-				setStatus('error')
-				setMessage('Payment not found.')
-				return
-			}
-
-			switch (paymentIntent.status) {
-				case 'succeeded':
-					setStatus('success')
-					setMessage('Payment successful! Activating your subscription...')
-					
-					// Get subscription details from metadata
-					const subscriptionId = paymentIntent.metadata?.subscription_id
-					const customerId = paymentIntent.metadata?.customer_id
-					
-					if (subscriptionId) {
-						// Poll for subscription activation
-						pollSubscriptionStatus(subscriptionId, customerId || '')
-					} else {
-						// Fallback: just redirect to success
-						setTimeout(() => {
-							router.push('/checkout/success')
-						}, 2000)
-					}
-					break
-
-				case 'processing':
-					setMessage('Your payment is being processed. Please wait...')
-					// Check again in a few seconds
-					setTimeout(() => {
-						window.location.reload()
-					}, 3000)
-					break
-
-				case 'requires_payment_method':
-					setStatus('error')
-					setMessage('Payment failed. Please try another payment method.')
-					setTimeout(() => {
-						router.push('/checkout')
-					}, 3000)
-					break
-
-				default:
-					setStatus('error')
-					setMessage('Something went wrong with your payment.')
-					setTimeout(() => {
-						router.push('/checkout')
-					}, 3000)
-					break
-			}
-		})
-	}, [stripe, searchParams, router])
-
-	const pollSubscriptionStatus = async (subscriptionId: string, customerId: string) => {
+	const pollSubscriptionStatus = useCallback(async (subscriptionId: string, customerId: string) => {
 		const maxAttempts = 10
 		const baseDelay = 1000
 
@@ -139,7 +71,77 @@ function ProcessingContent() {
 		// Timeout
 		setStatus('error')
 		setMessage('Subscription activation is taking longer than expected. Please check your email for confirmation.')
-	}
+	}, [router])
+
+	useEffect(() => {
+		if (!stripe) {
+			return
+		}
+
+		const clientSecret = searchParams.get('payment_intent_client_secret')
+
+		if (!clientSecret) {
+			setStatus('error')
+			setMessage('Payment information not found. Please try again.')
+			return
+		}
+
+		// Retrieve the PaymentIntent to check its status
+		stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => {
+			if (!paymentIntent) {
+				setStatus('error')
+				setMessage('Payment not found.')
+				return
+			}
+
+			switch (paymentIntent.status) {
+				case 'succeeded':
+					setStatus('success')
+					setMessage('Payment successful! Activating your subscription...')
+					
+					// Get subscription details from metadata
+					// Cast to any to access metadata which exists but isn't typed
+					const metadata = (paymentIntent as any).metadata || {}
+					const subscriptionId = metadata.subscription_id
+					const customerId = metadata.customer_id
+					
+					if (subscriptionId) {
+						// Poll for subscription activation
+						pollSubscriptionStatus(subscriptionId, customerId || '')
+					} else {
+						// Fallback: just redirect to success
+						setTimeout(() => {
+							router.push('/checkout/success')
+						}, 2000)
+					}
+					break
+
+				case 'processing':
+					setMessage('Your payment is being processed. Please wait...')
+					// Check again in a few seconds
+					setTimeout(() => {
+						window.location.reload()
+					}, 3000)
+					break
+
+				case 'requires_payment_method':
+					setStatus('error')
+					setMessage('Payment failed. Please try another payment method.')
+					setTimeout(() => {
+						router.push('/checkout')
+					}, 3000)
+					break
+
+				default:
+					setStatus('error')
+					setMessage('Something went wrong with your payment.')
+					setTimeout(() => {
+						router.push('/checkout')
+					}, 3000)
+					break
+			}
+		})
+	}, [stripe, searchParams, router, pollSubscriptionStatus])
 
 	return (
 		<div className="min-h-screen bg-brand-beige flex items-center justify-center">
