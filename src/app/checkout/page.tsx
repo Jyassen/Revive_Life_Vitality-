@@ -306,9 +306,14 @@ function CheckoutContent() {
 		try {
 			setLoading(true)
 			
-			// You'll need to pass the Stripe Price ID from your product catalog
-			// For Revive Club, you'll get this from your Stripe dashboard
-			const priceId = 'price_REVIVE_CLUB_WEEKLY' // Replace with actual Price ID
+			// Get Price ID from environment variable or use placeholder for development
+			const priceId = process.env.NEXT_PUBLIC_STRIPE_REVIVE_CLUB_PRICE_ID || 'price_REVIVE_CLUB_WEEKLY'
+			
+			if (priceId === 'price_REVIVE_CLUB_WEEKLY') {
+				setError('payment', 'Subscription product not configured. Please contact support.')
+				setLoading(false)
+				return
+			}
 
 			const response = await fetch('/api/stripe/create-subscription', {
 				method: 'POST',
