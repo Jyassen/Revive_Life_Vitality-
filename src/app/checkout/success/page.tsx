@@ -105,10 +105,10 @@ function CheckoutSuccessContent() {
             <div className="text-sm text-brand-brown">
               Questions about your order? Contact us at{' '}
               <a 
-                href="mailto:hello@revivelifevitality.com" 
+                href="mailto:revivelifevitality@gmail.com" 
                 className="text-brand-dark hover:text-brand-brown transition-colors"
               >
-                hello@revivelifevitality.com
+                revivelifevitality@gmail.com
               </a>
             </div>
           </div>

@@ -21,7 +21,7 @@ const faqItems = [
   },
   {
     title: "What if I'm not satisfied?", // Corrected typo
-    children: "We stand behind our products! If you're not completely satisfied with your purchase, please contact our customer service team at info@revivelifevitality.com, and we'll work to make it right, which may include a refund or replacement.",
+    children: "We stand behind our products! If you're not completely satisfied with your purchase, please contact our customer service team at revivelifevitality@gmail.com, and we'll work to make it right, which may include a refund or replacement.",
   },
 ];
 
