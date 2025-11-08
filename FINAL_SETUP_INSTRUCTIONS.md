@@ -412,3 +412,4 @@ Your Revive Life Vitality checkout is now powered by Stripe with full subscripti
 
 **Happy selling!** 🎉
 
+

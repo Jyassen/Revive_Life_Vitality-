@@ -45,20 +45,20 @@ const packageDetails: Record<string, PackageDetailsType> = {
   },
   'pro-pack': {
     name: 'Pro Pack',
-    price: '$39.99',
+    price: '$43.00',
     image: '/images/Pro Pack.png',
     totalShots: 7,
     description: 'Get more value with our popular pro option.'
   },
   'revive-club': {
     name: 'Revive Club',
-    price: '$35.99',
+    price: '$38.00',
     image: '/images/Revive club.png',
     totalShots: 7,
     description: 'Weekly subscription with exclusive savings!',
     subscription: {
       frequency: 'weekly' as const,
-      discount: 10
+      discount: 12
     }
   }
 }

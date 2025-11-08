@@ -29,7 +29,7 @@ const packageOptions: PackageOption[] = [
     id: 'pro-pack',
     title: 'Pro Pack',
     description: 'Get more value with our popular pro option.',
-    price: '$39.99',
+    price: '$43.00',
     image: '/images/Pro Pack.png',
     features: ['7 juice shots', '$10 delivery fee', 'One-time purchase', 'Best value for regular customers']
   },
@@ -37,12 +37,12 @@ const packageOptions: PackageOption[] = [
     id: 'revive-club',
     title: 'Revive Club',
     description: 'Weekly subscription with exclusive savings!',
-    price: '$35.99/week',
-    originalPrice: '$39.99',
-    savings: 'Save 10%',
+    price: '$38.00/week',
+    originalPrice: '$43.00',
+    savings: 'Save 12%',
     isRecommended: true,
     image: '/images/Revive club.png',
-    features: ['7 juice shots weekly', '10% off Pro Pack price', '$10 delivery fee', 'Cancel anytime']
+    features: ['7 juice shots weekly', '12% off Pro Pack price', '$10 delivery fee', 'Cancel anytime']
   }
 ];
 

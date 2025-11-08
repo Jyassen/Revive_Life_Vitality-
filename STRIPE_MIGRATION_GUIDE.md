@@ -277,3 +277,4 @@ Your Stripe integration is complete and ready for testing. The implementation fo
 
 **Need help?** Check the Stripe Dashboard logs or reach out to Stripe support - they're excellent!
 
+

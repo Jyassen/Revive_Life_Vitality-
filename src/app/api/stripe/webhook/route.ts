@@ -191,6 +191,13 @@ async function handlePaymentIntentSucceeded(paymentIntent: Stripe.PaymentIntent)
 	// TODO: Implement additional business logic here:
 	// 1. Update order status in database
 	// 2. Send confirmation email to customer
+	//    NOTE: Stripe sends basic receipt emails, but you may want custom emails with:
+	//    - Full itemized order details (product names, quantities, images)
+	//    - Shipping address
+	//    - Order number
+	//    - Special instructions
+	//    - Estimated delivery date
+	//    Consider using SendGrid, Resend, or AWS SES for custom transactional emails
 	// 3. Trigger fulfillment process
 	// 4. Update inventory
 	// 5. Send notification to admin
@@ -409,6 +416,11 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
 	// TODO: Implement your business logic here:
 	// 1. Create new order for this billing period
 	// 2. Send payment receipt email
+	//    NOTE: Stripe sends basic receipt emails, but for subscriptions you may want:
+	//    - Custom renewal confirmation with subscription details
+	//    - Next billing date reminder
+	//    - Shipment tracking info
+	//    - Thank you message with customer loyalty perks
 	// 3. Schedule shipment
 	// 4. Update next billing date
 	// 5. Thank customer for continued subscription

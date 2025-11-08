@@ -71,7 +71,23 @@ export async function POST(request: NextRequest) {
 
 	const subscription = await stripe.subscriptions.create({
 		customer: stripeCustomer.id,
-		items: [{ price: priceId }],
+		items: [
+			{ price: priceId },
+			{
+				price_data: {
+					currency: 'usd',
+					product_data: {
+						name: 'Shipping & Handling',
+						description: 'Weekly shipping fee',
+					},
+					unit_amount: 1000,
+					recurring: {
+						interval: 'week',
+					},
+				} as any,
+				quantity: 1,
+			},
+		],
 		payment_behavior: 'default_incomplete',
 		payment_settings: {
 			payment_method_types: ['card'],
@@ -82,6 +98,7 @@ export async function POST(request: NextRequest) {
 			...metadata,
 			customer_name: customerData.name,
 			shipping_address: JSON.stringify(shippingAddress),
+			shipping_cost: '10.00',
 		},
 		...(trialPeriodDays && { trial_period_days: trialPeriodDays }),
 	}) as unknown as ExpandedSubscription
@@ -105,6 +122,7 @@ export async function POST(request: NextRequest) {
 		currency: invoice.currency || 'usd',
 		customer: stripeCustomer.id,
 		description: `Subscription payment for ${customer.email}`,
+		receipt_email: customer.email,
 		metadata: {
 			subscription_id: subscription.id,
 			invoice_id: invoice.id,

@@ -397,3 +397,4 @@ Your app now supports:
 
 **Questions?** Check the Stripe Dashboard or support - they're excellent!
 
+
