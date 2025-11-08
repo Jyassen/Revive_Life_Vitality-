@@ -76,6 +76,7 @@ export async function POST(request: NextRequest) {
 			{
 				price_data: {
 					currency: 'usd',
+					// @ts-expect-error - Stripe API supports product_data but TypeScript definitions are incomplete
 					product_data: {
 						name: 'Shipping & Handling',
 						description: 'Weekly shipping fee',
@@ -84,7 +85,7 @@ export async function POST(request: NextRequest) {
 					recurring: {
 						interval: 'week',
 					},
-				} as any,
+				},
 				quantity: 1,
 			},
 		],
