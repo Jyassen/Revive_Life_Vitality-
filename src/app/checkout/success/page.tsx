@@ -123,9 +123,10 @@ function CheckoutSuccessContent() {
             </p>
             <ul className="text-left text-sm text-brand-brown space-y-2 max-w-md mx-auto">
               <li>• Take your shots on an empty stomach for best absorption</li>
-              <li>• Store in the refrigerator and consume within 3 days</li>
+              <li>• Or you may take with food if you&apos;re sensitive to strong flavor</li>
+              <li>• Store in the refrigerator. Best consumed within 7 days</li>
               <li>• Follow up with plenty of water throughout the day</li>
-              <li>• Consider taking photos to track your wellness journey</li>
+              <li>• Consider journaling or taking photos to track your wellness journey</li>
             </ul>
           </div>
         </div>
