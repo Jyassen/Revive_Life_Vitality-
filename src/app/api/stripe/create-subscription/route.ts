@@ -72,22 +72,7 @@ export async function POST(request: NextRequest) {
 	const subscription = await stripe.subscriptions.create({
 		customer: stripeCustomer.id,
 		items: [
-			{ price: priceId },
-			{
-				price_data: {
-					currency: 'usd',
-					// @ts-expect-error - Stripe API supports product_data but TypeScript definitions are incomplete
-					product_data: {
-						name: 'Shipping & Handling',
-						description: 'Weekly shipping fee',
-					},
-					unit_amount: 1000,
-					recurring: {
-						interval: 'week',
-					},
-				},
-				quantity: 1,
-			},
+			{ price: priceId }, // Now $48/week (includes $38 product + $10 shipping)
 		],
 		payment_behavior: 'default_incomplete',
 		payment_settings: {
@@ -95,6 +80,9 @@ export async function POST(request: NextRequest) {
 			save_default_payment_method: 'on_subscription',
 		},
 		expand: ['latest_invoice'],
+		automatic_tax: {
+			enabled: true,
+		},
 		metadata: {
 			...metadata,
 			customer_name: customerData.name,
