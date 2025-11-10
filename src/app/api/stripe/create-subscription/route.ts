@@ -80,9 +80,6 @@ export async function POST(request: NextRequest) {
 			save_default_payment_method: 'on_subscription',
 		},
 		expand: ['latest_invoice'],
-		automatic_tax: {
-			enabled: true,
-		},
 		metadata: {
 			...metadata,
 			customer_name: customerData.name,

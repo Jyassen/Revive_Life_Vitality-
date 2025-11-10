@@ -98,10 +98,6 @@ export class StripeAPI {
 				automatic_payment_methods: {
 					enabled: true,
 				},
-				// @ts-expect-error - Stripe API supports automatic_tax but TypeScript definitions are incomplete
-				automatic_tax: {
-					enabled: true,
-				},
 				description: request.description,
 				...(request.metadata && {
 					metadata: request.metadata as unknown as Record<string, string>,
