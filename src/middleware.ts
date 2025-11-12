@@ -128,6 +128,12 @@ async function scanForSensitiveData(request: NextRequest): Promise<boolean> {
 export async function middleware(request: NextRequest) {
 	const { pathname } = request.nextUrl
 
+	// CRITICAL: Skip all middleware processing for Stripe webhooks
+	// Webhooks require raw, unmodified request body for signature verification
+	if (pathname === '/api/stripe/webhook') {
+		return NextResponse.next()
+	}
+
 	// Apply rate limiting to payment endpoints
 	if (pathname.startsWith('/api/payment/')) {
 		const clientId = getClientId(request)
