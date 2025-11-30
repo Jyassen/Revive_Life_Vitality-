@@ -22,33 +22,28 @@ export async function POST(request: NextRequest) {
 		const { code } = validationResult.data
 		const stripe = getStripeInstance()
 
-		// Look up the promotion code in Stripe - try both original and uppercase
-		let promotionCodes = await stripe.promotionCodes.list({
-			code: code,
-			limit: 1,
+		// Look up the promotion code in Stripe
+		// List all active promotion codes and find the matching one
+		const promotionCodes = await stripe.promotionCodes.list({
 			active: true,
+			limit: 100,
 		})
 
-		// If not found, try uppercase
-		if (promotionCodes.data.length === 0) {
-			promotionCodes = await stripe.promotionCodes.list({
-				code: code.toUpperCase(),
-				limit: 1,
-				active: true,
-			})
-		}
+		// Find the matching code (case-insensitive)
+		const promoCode = promotionCodes.data.find(
+			pc => pc.code.toUpperCase() === code.toUpperCase()
+		)
 
-		if (promotionCodes.data.length === 0) {
+		if (!promoCode) {
+			console.log('Available codes:', promotionCodes.data.map(pc => pc.code))
 			return NextResponse.json({
 				valid: false,
 				message: 'Promo code not found',
 			})
 		}
-
-		const promoCode = promotionCodes.data[0]
 		
 		// Debug log
-		console.log('Promo code object:', JSON.stringify(promoCode, null, 2))
+		console.log('Promo code found:', promoCode.code, 'ID:', promoCode.id)
 
 		if (!promoCode.active) {
 			return NextResponse.json({
