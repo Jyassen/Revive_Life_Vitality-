@@ -125,11 +125,25 @@ export async function POST(request: NextRequest) {
 		throw new Error('Subscription created but no invoice found')
 	}
 
-	// If amount is $0 (100% discount), mark subscription as active and skip payment
+	console.log('Invoice details:', {
+		id: invoice.id,
+		amount_due: invoice.amount_due,
+		total: invoice.total,
+		subtotal: invoice.subtotal,
+		status: invoice.status,
+	})
+
+	// If amount is $0 or less (coupon makes it free), mark subscription as active and skip payment
 	let clientSecret: string | null = null
-	if (invoice.amount_due === 0) {
-		// Pay the $0 invoice to activate the subscription
-		await stripe.invoices.pay(invoice.id)
+	if (invoice.amount_due <= 0) {
+		try {
+			// Pay the $0 invoice to activate the subscription
+			await stripe.invoices.pay(invoice.id)
+			console.log('$0 invoice paid successfully')
+		} catch (payError) {
+			// If invoice is already paid or voided, that's fine
+			console.log('Invoice pay result:', payError)
+		}
 		// Return a special indicator that no payment is needed
 		clientSecret = 'no_payment_required'
 	} else {
@@ -189,25 +203,31 @@ export async function POST(request: NextRequest) {
 	})
 
 	} catch (error) {
-		// Sanitize error logging
-		const sanitizedError = {
-			message: error instanceof Error ? error.message : 'Unknown error',
+		// Detailed error logging
+		const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+		const errorDetails = {
+			message: errorMessage,
 			timestamp: new Date().toISOString(),
 			type: error?.constructor?.name || 'UnknownError',
+			// Include Stripe error details if available
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			stripeCode: (error as any)?.code,
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			stripeType: (error as any)?.type,
 		}
-		console.error('Subscription creation error:', sanitizedError)
+		console.error('Subscription creation error:', errorDetails)
 
 		// Audit log for failed subscription
 		console.info('AUDIT_LOG', {
 			event: 'SUBSCRIPTION_CREATION_FAILED',
 			timestamp: new Date().toISOString(),
-			error: sanitizedError.message,
+			error: errorMessage,
 		})
 
 		return NextResponse.json(
 			{ 
 				error: 'Failed to create subscription',
-				message: 'Unable to create subscription. Please try again.'
+				message: errorMessage,
 			},
 			{ status: 500 }
 		)
