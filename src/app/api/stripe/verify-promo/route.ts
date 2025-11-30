@@ -3,6 +3,11 @@ import { getStripeInstance } from '@/lib/stripe'
 import { z } from 'zod'
 import Stripe from 'stripe'
 
+// Extended type for PromotionCode with coupon included
+interface PromotionCodeWithCoupon extends Stripe.PromotionCode {
+	coupon: Stripe.Coupon
+}
+
 const verifyPromoSchema = z.object({
 	code: z.string().min(1),
 })
@@ -30,17 +35,20 @@ export async function POST(request: NextRequest) {
 		})
 
 		// Find the matching code (case-insensitive)
-		const promoCode = promotionCodes.data.find(
+		const promoCodeRaw = promotionCodes.data.find(
 			pc => pc.code.toUpperCase() === code.toUpperCase()
 		)
 
-		if (!promoCode) {
+		if (!promoCodeRaw) {
 			console.log('Available codes:', promotionCodes.data.map(pc => pc.code))
 			return NextResponse.json({
 				valid: false,
 				message: 'Promo code not found',
 			})
 		}
+
+		// Cast to include coupon (always present in Stripe API response)
+		const promoCode = promoCodeRaw as PromotionCodeWithCoupon
 		
 		// Debug log
 		console.log('Promo code found:', promoCode.code, 'ID:', promoCode.id)
@@ -52,25 +60,15 @@ export async function POST(request: NextRequest) {
 			})
 		}
 
-		// The coupon field should be directly on the promotion code object
-		// In Stripe's API, it's always included (not needing expansion)
-		const couponData = promoCode.coupon
+		// Get the coupon from the promo code
+		const coupon = promoCode.coupon
 		
-		if (!couponData) {
-			// Fallback: try to get coupon ID from restrictions or metadata
+		if (!coupon) {
 			console.log('No coupon on promo code, raw object:', promoCode)
 			return NextResponse.json({
 				valid: false,
 				message: 'Coupon configuration error',
 			})
-		}
-
-		// couponData could be a string ID or full Coupon object
-		let coupon: Stripe.Coupon
-		if (typeof couponData === 'string') {
-			coupon = await stripe.coupons.retrieve(couponData)
-		} else {
-			coupon = couponData
 		}
 
 		// Return success with coupon details
