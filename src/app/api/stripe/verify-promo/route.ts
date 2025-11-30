@@ -62,11 +62,12 @@ export async function POST(request: NextRequest) {
 		})
 
 	} catch (error) {
-		console.error('Promo verification error:', error)
+		const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+		console.error('Promo verification error:', errorMessage, error)
 		return NextResponse.json(
 			{ 
 				valid: false,
-				message: 'Failed to verify promo code'
+				message: `Error: ${errorMessage}`
 			},
 			{ status: 500 }
 		)
