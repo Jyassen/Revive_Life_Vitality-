@@ -3,14 +3,6 @@ import { getStripeInstance } from '@/lib/stripe'
 import { z } from 'zod'
 import Stripe from 'stripe'
 
-// Extended type for PromotionCode with promotion.coupon structure
-interface PromotionCodeWithPromotion extends Stripe.PromotionCode {
-	promotion?: {
-		coupon: string
-		type: string
-	}
-}
-
 const verifyPromoSchema = z.object({
 	code: z.string().min(1),
 })
@@ -50,13 +42,10 @@ export async function POST(request: NextRequest) {
 			})
 		}
 
-		// Cast to include promotion structure
-		const promoCode = promoCodeRaw as PromotionCodeWithPromotion
-		
 		// Debug log
-		console.log('Promo code found:', promoCode.code, 'ID:', promoCode.id)
+		console.log('Promo code found:', promoCodeRaw.code, 'ID:', promoCodeRaw.id)
 
-		if (!promoCode.active) {
+		if (!promoCodeRaw.active) {
 			return NextResponse.json({
 				valid: false,
 				message: 'Promo code is no longer active',
@@ -64,10 +53,12 @@ export async function POST(request: NextRequest) {
 		}
 
 		// Get the coupon ID from promotion.coupon (Stripe's actual structure)
-		const couponId = promoCode.promotion?.coupon
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const promoCodeAny = promoCodeRaw as any
+		const couponId = promoCodeAny.promotion?.coupon as string | undefined
 		
 		if (!couponId) {
-			console.log('No coupon ID on promo code, raw object:', promoCode)
+			console.log('No coupon ID on promo code, raw object:', promoCodeRaw)
 			return NextResponse.json({
 				valid: false,
 				message: 'Coupon configuration error',
@@ -90,7 +81,7 @@ export async function POST(request: NextRequest) {
 			valid: true,
 			message: `Valid! ${discountDescription}`,
 			discount: discountDescription,
-			promoId: promoCode.id,
+			promoId: promoCodeRaw.id,
 		})
 
 	} catch (error) {
