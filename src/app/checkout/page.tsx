@@ -289,13 +289,24 @@ function CheckoutContent() {
 			if (response.ok && data.valid) {
 				setPromoCodeApplied(true)
 				setPromoCodeError('')
+				
+				// Calculate and set the discount amount
+				const subtotal = orderSummary?.subtotal || totalPrice
+				if (data.percentOff) {
+					const discountAmount = (subtotal * data.percentOff) / 100
+					setPromoDiscount(discountAmount)
+				} else if (data.amountOff) {
+					setPromoDiscount(data.amountOff)
+				}
 			} else {
 				setPromoCodeError(data.message || 'Invalid promo code')
 				setPromoCodeApplied(false)
+				setPromoDiscount(0)
 			}
 		} catch (_error) {
 			setPromoCodeError('Failed to verify promo code')
 			setPromoCodeApplied(false)
+			setPromoDiscount(0)
 		} finally {
 			setVerifyingPromo(false)
 		}

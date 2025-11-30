@@ -79,7 +79,9 @@ export async function POST(request: NextRequest) {
 		return NextResponse.json({
 			valid: true,
 			message: `Valid! ${discountDescription}`,
-			discount: discountDescription,
+			discountDescription: discountDescription,
+			percentOff: coupon.percent_off || null,
+			amountOff: coupon.amount_off ? coupon.amount_off / 100 : null,
 			promoId: promoCodeRaw.id,
 		})
 
