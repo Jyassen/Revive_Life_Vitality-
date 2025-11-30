@@ -37,6 +37,9 @@ export async function POST(request: NextRequest) {
 		}
 
 		const promoCode = promotionCodes.data[0]
+		
+		// Debug log to see what we got
+		console.log('Promo code found:', JSON.stringify(promoCode, null, 2))
 
 		if (!promoCode.active) {
 			return NextResponse.json({
@@ -45,14 +48,23 @@ export async function POST(request: NextRequest) {
 			})
 		}
 
-		// Get the coupon - it might be a string ID or expanded object
-		const promoCoupon = (promoCode as Stripe.Response<Stripe.PromotionCode> & { coupon: Stripe.Coupon | string }).coupon
+		// Get the coupon - handle all cases
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const promoCouponRaw = (promoCode as any).coupon
+		
+		if (!promoCouponRaw) {
+			return NextResponse.json({
+				valid: false,
+				message: 'Coupon data not found',
+			})
+		}
+
 		let coupon: Stripe.Coupon
-		if (typeof promoCoupon === 'string') {
+		if (typeof promoCouponRaw === 'string') {
 			// Coupon wasn't expanded, fetch it
-			coupon = await stripe.coupons.retrieve(promoCoupon)
+			coupon = await stripe.coupons.retrieve(promoCouponRaw)
 		} else {
-			coupon = promoCoupon
+			coupon = promoCouponRaw as Stripe.Coupon
 		}
 
 		// Return success with coupon details
