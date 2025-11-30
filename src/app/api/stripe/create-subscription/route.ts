@@ -63,25 +63,31 @@ export async function POST(request: NextRequest) {
 			},
 		})
 
-		// If promotion code provided, retrieve it to get the coupon ID
-		let couponId: string | undefined
-		if (promotionCode) {
-			try {
-				const promotionCodes = await stripe.promotionCodes.list({
-					code: promotionCode,
-					limit: 1,
-					expand: ['data.coupon'],
-				})
-				if (promotionCodes.data.length > 0 && promotionCodes.data[0].active) {
-					const promoCode = promotionCodes.data[0] as Stripe.PromotionCode & { 
-						coupon: Stripe.Coupon 
-					}
-					couponId = promoCode.coupon.id
-				}
-			} catch (err) {
-				console.warn('Promotion code lookup failed:', err)
+	// If promotion code provided, retrieve it to get the coupon ID
+	let couponId: string | undefined
+	if (promotionCode) {
+		try {
+			// List all active promotion codes and find the matching one
+			const promotionCodes = await stripe.promotionCodes.list({
+				active: true,
+				limit: 100,
+			})
+			
+			const matchedPromo = promotionCodes.data.find(
+				pc => pc.code.toUpperCase() === promotionCode.toUpperCase()
+			)
+			
+			if (matchedPromo) {
+				// Access coupon ID from promotion.coupon (Stripe's actual structure)
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				const promoAny = matchedPromo as any
+				couponId = promoAny.promotion?.coupon as string | undefined
+				console.log('Promo code matched:', matchedPromo.code, 'couponId:', couponId)
 			}
+		} catch (err) {
+			console.warn('Promotion code lookup failed:', err)
 		}
+	}
 
 	// Create subscription with incomplete status
 	// payment_behavior: 'default_incomplete' creates subscription + invoice but NOT payment intent
