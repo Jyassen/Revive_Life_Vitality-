@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
 			shipping_cost: '10.00',
 			...(promotionCode && { promotion_code: promotionCode }),
 		},
-		...(couponId && { coupon: couponId }),
+		...(couponId && { discounts: [{ coupon: couponId }] }),
 		...(trialPeriodDays && { trial_period_days: trialPeriodDays }),
 	}) as unknown as ExpandedSubscription
 
