@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getStripeInstance } from '@/lib/stripe'
 import { z } from 'zod'
-import Stripe from 'stripe'
 
 const verifyPromoSchema = z.object({
 	code: z.string().min(1),
