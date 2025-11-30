@@ -545,7 +545,6 @@ function CheckoutContent() {
 												label="First Name"
 												name="firstName"
 												type="text"
-												placeholder="John"
 												value={formData.firstName}
 												onChange={(value) => handleInputChange('firstName', value)}
 												error={errors.firstName}
@@ -556,7 +555,6 @@ function CheckoutContent() {
 												label="Last Name"
 												name="lastName"
 												type="text"
-												placeholder="Doe"
 												value={formData.lastName}
 												onChange={(value) => handleInputChange('lastName', value)}
 												error={errors.lastName}
@@ -569,18 +567,16 @@ function CheckoutContent() {
 												label="Email Address"
 												name="email"
 												type="email"
-												placeholder="your@email.com"
 												value={formData.email}
 												onChange={(value) => handleInputChange('email', value)}
 												error={errors.email}
 												required
 											/>
-
+											
 											<FormField
 												label="Phone Number"
 												name="phone"
 												type="tel"
-												placeholder="(555) 123-4567"
 												value={formData.phone}
 												onChange={(value) => handleInputChange('phone', value)}
 												error={errors.phone}
@@ -621,17 +617,15 @@ function CheckoutContent() {
 											<FormField
 												label="First Name"
 												name="shippingFirstName"
-												placeholder={formData.firstName || 'John'}
 												value={formData.shippingFirstName}
 												onChange={(value) => handleInputChange('shippingFirstName', value)}
 												error={errors.shippingFirstName}
 												required
 											/>
-
+											
 											<FormField
 												label="Last Name"
 												name="shippingLastName"
-												placeholder={formData.lastName || 'Doe'}
 												value={formData.shippingLastName}
 												onChange={(value) => handleInputChange('shippingLastName', value)}
 												error={errors.shippingLastName}
@@ -655,7 +649,6 @@ function CheckoutContent() {
 											<FormField
 												label="Street Address"
 												name="address1"
-												placeholder="123 Main Street"
 												value={formData.address1}
 												onChange={(value) => handleInputChange('address1', value)}
 												error={errors.address1}
@@ -665,7 +658,6 @@ function CheckoutContent() {
 											<FormField
 												label="Apartment, suite, etc."
 												name="address2"
-												placeholder="Apt 4B (optional)"
 												value={formData.address2}
 												onChange={(value) => handleInputChange('address2', value)}
 												error={errors.address2}
@@ -675,7 +667,6 @@ function CheckoutContent() {
 												<FormField
 													label="City"
 													name="city"
-													placeholder="San Francisco"
 													value={formData.city}
 													onChange={(value) => handleInputChange('city', value)}
 													error={errors.city}
@@ -686,7 +677,6 @@ function CheckoutContent() {
 													label="State"
 													name="state"
 													type="select"
-													placeholder="Select state"
 													value={formData.state}
 													onChange={(value) => handleInputChange('state', value)}
 													error={errors.state}
@@ -697,7 +687,6 @@ function CheckoutContent() {
 												<FormField
 													label="ZIP Code"
 													name="zipCode"
-													placeholder="12345"
 													value={formData.zipCode}
 													onChange={(value) => handleInputChange('zipCode', value)}
 													error={errors.zipCode}
