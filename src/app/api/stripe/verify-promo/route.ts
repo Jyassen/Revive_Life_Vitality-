@@ -3,9 +3,12 @@ import { getStripeInstance } from '@/lib/stripe'
 import { z } from 'zod'
 import Stripe from 'stripe'
 
-// Extended type for PromotionCode with coupon included
-interface PromotionCodeWithCoupon extends Stripe.PromotionCode {
-	coupon: Stripe.Coupon
+// Extended type for PromotionCode with promotion.coupon structure
+interface PromotionCodeWithPromotion extends Stripe.PromotionCode {
+	promotion?: {
+		coupon: string
+		type: string
+	}
 }
 
 const verifyPromoSchema = z.object({
@@ -47,8 +50,8 @@ export async function POST(request: NextRequest) {
 			})
 		}
 
-		// Cast to include coupon (always present in Stripe API response)
-		const promoCode = promoCodeRaw as PromotionCodeWithCoupon
+		// Cast to include promotion structure
+		const promoCode = promoCodeRaw as PromotionCodeWithPromotion
 		
 		// Debug log
 		console.log('Promo code found:', promoCode.code, 'ID:', promoCode.id)
@@ -60,16 +63,20 @@ export async function POST(request: NextRequest) {
 			})
 		}
 
-		// Get the coupon from the promo code
-		const coupon = promoCode.coupon
+		// Get the coupon ID from promotion.coupon (Stripe's actual structure)
+		const couponId = promoCode.promotion?.coupon
 		
-		if (!coupon) {
-			console.log('No coupon on promo code, raw object:', promoCode)
+		if (!couponId) {
+			console.log('No coupon ID on promo code, raw object:', promoCode)
 			return NextResponse.json({
 				valid: false,
 				message: 'Coupon configuration error',
 			})
 		}
+
+		// Fetch the full coupon object from Stripe
+		const coupon = await stripe.coupons.retrieve(couponId)
+		console.log('Coupon retrieved:', coupon.id, 'percent_off:', coupon.percent_off)
 
 		// Return success with coupon details
 		let discountDescription = ''
