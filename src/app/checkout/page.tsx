@@ -114,6 +114,8 @@ function CheckoutContent() {
 	const [promoCode, setPromoCode] = useState('')
 	const [promoCodeApplied, setPromoCodeApplied] = useState(false)
 	const [promoDiscount, setPromoDiscount] = useState(0)
+	const [promoCodeError, setPromoCodeError] = useState('')
+	const [verifyingPromo, setVerifyingPromo] = useState(false)
 
 	const states = [
 		{ value: 'AL', label: 'Alabama' },
@@ -262,6 +264,40 @@ function CheckoutContent() {
 			} else {
 				await createPaymentIntent(customerData, shippingData)
 			}
+		}
+	}
+
+	// Verify promo code
+	const verifyPromoCode = async () => {
+		if (!promoCode.trim()) {
+			setPromoCodeError('Please enter a promo code')
+			return
+		}
+
+		setVerifyingPromo(true)
+		setPromoCodeError('')
+
+		try {
+			const response = await fetch('/api/stripe/verify-promo', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ code: promoCode }),
+			})
+
+			const data = await response.json()
+
+			if (response.ok && data.valid) {
+				setPromoCodeApplied(true)
+				setPromoCodeError('')
+			} else {
+				setPromoCodeError(data.message || 'Invalid promo code')
+				setPromoCodeApplied(false)
+			}
+		} catch (error) {
+			setPromoCodeError('Failed to verify promo code')
+			setPromoCodeApplied(false)
+		} finally {
+			setVerifyingPromo(false)
 		}
 	}
 
@@ -713,19 +749,39 @@ function CheckoutContent() {
 												type="text"
 												placeholder="Enter promo code"
 												value={promoCode}
-												onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+												onChange={(e) => {
+													setPromoCode(e.target.value.toUpperCase())
+													setPromoCodeError('')
+													setPromoCodeApplied(false)
+												}}
 												className="flex-1 px-4 py-3 border border-brand-brown/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-green"
 												disabled={promoCodeApplied}
 											/>
-											{promoCodeApplied && (
-												<span className="text-brand-green flex items-center px-4">
+											{!promoCodeApplied ? (
+												<Button
+													type="button"
+													variant="secondary"
+													onClick={verifyPromoCode}
+													disabled={!promoCode.trim() || verifyingPromo}
+													className="px-6"
+													ariaLabel="Apply promo code"
+												>
+													{verifyingPromo ? 'Verifying...' : 'Apply'}
+												</Button>
+											) : (
+												<span className="text-brand-green flex items-center px-4 font-medium">
 													✓ Applied
 												</span>
 											)}
 										</div>
-										{promoCode && promoCodeApplied && (
-											<p className="text-sm text-brand-green mt-2">
-												Promotional discount will be applied at checkout
+										{promoCodeError && (
+											<p className="text-sm text-red-600 mt-2">
+												{promoCodeError}
+											</p>
+										)}
+										{promoCodeApplied && (
+											<p className="text-sm text-brand-green mt-2 font-medium">
+												✓ Code verified! Discount will be applied at checkout
 											</p>
 										)}
 									</div>
