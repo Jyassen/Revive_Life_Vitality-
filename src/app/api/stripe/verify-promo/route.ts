@@ -22,12 +22,21 @@ export async function POST(request: NextRequest) {
 		const { code } = validationResult.data
 		const stripe = getStripeInstance()
 
-		// Look up the promotion code in Stripe
-		const promotionCodes = await stripe.promotionCodes.list({
-			code: code.toUpperCase(),
+		// Look up the promotion code in Stripe - try both original and uppercase
+		let promotionCodes = await stripe.promotionCodes.list({
+			code: code,
 			limit: 1,
-			expand: ['data.coupon'],
+			active: true,
 		})
+
+		// If not found, try uppercase
+		if (promotionCodes.data.length === 0) {
+			promotionCodes = await stripe.promotionCodes.list({
+				code: code.toUpperCase(),
+				limit: 1,
+				active: true,
+			})
+		}
 
 		if (promotionCodes.data.length === 0) {
 			return NextResponse.json({
@@ -38,8 +47,8 @@ export async function POST(request: NextRequest) {
 
 		const promoCode = promotionCodes.data[0]
 		
-		// Debug log to see what we got
-		console.log('Promo code found:', JSON.stringify(promoCode, null, 2))
+		// Debug log
+		console.log('Promo code object:', JSON.stringify(promoCode, null, 2))
 
 		if (!promoCode.active) {
 			return NextResponse.json({
@@ -48,23 +57,25 @@ export async function POST(request: NextRequest) {
 			})
 		}
 
-		// Get the coupon - handle all cases
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		const promoCouponRaw = (promoCode as any).coupon
+		// The coupon field should be directly on the promotion code object
+		// In Stripe's API, it's always included (not needing expansion)
+		const couponData = promoCode.coupon
 		
-		if (!promoCouponRaw) {
+		if (!couponData) {
+			// Fallback: try to get coupon ID from restrictions or metadata
+			console.log('No coupon on promo code, raw object:', promoCode)
 			return NextResponse.json({
 				valid: false,
-				message: 'Coupon data not found',
+				message: 'Coupon configuration error',
 			})
 		}
 
+		// couponData could be a string ID or full Coupon object
 		let coupon: Stripe.Coupon
-		if (typeof promoCouponRaw === 'string') {
-			// Coupon wasn't expanded, fetch it
-			coupon = await stripe.coupons.retrieve(promoCouponRaw)
+		if (typeof couponData === 'string') {
+			coupon = await stripe.coupons.retrieve(couponData)
 		} else {
-			coupon = promoCouponRaw as Stripe.Coupon
+			coupon = couponData
 		}
 
 		// Return success with coupon details
@@ -79,6 +90,7 @@ export async function POST(request: NextRequest) {
 			valid: true,
 			message: `Valid! ${discountDescription}`,
 			discount: discountDescription,
+			promoId: promoCode.id,
 		})
 
 	} catch (error) {
