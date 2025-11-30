@@ -23,6 +23,7 @@ const createSubscriptionSchema = z.object({
 		zipCode: z.string(),
 		country: z.string(),
 	}),
+	promotionCode: z.string().optional(),
 	metadata: z.record(z.string()).optional(),
 	trialPeriodDays: z.number().optional(),
 })
@@ -43,7 +44,7 @@ export async function POST(request: NextRequest) {
 			)
 		}
 
-		const { priceId, customer, shippingAddress, metadata, trialPeriodDays } = validationResult.data
+		const { priceId, customer, shippingAddress, promotionCode, metadata, trialPeriodDays } = validationResult.data
 
 		// Initialize Stripe API
 		const stripeAPI = new StripeAPI()
@@ -61,6 +62,26 @@ export async function POST(request: NextRequest) {
 				customer_type: 'subscription',
 			},
 		})
+
+		// If promotion code provided, retrieve it to get the coupon ID
+		let couponId: string | undefined
+		if (promotionCode) {
+			try {
+				const promotionCodes = await stripe.promotionCodes.list({
+					code: promotionCode,
+					limit: 1,
+					expand: ['data.coupon'],
+				})
+				if (promotionCodes.data.length > 0 && promotionCodes.data[0].active) {
+					const promoCode = promotionCodes.data[0] as Stripe.PromotionCode & { 
+						coupon: Stripe.Coupon 
+					}
+					couponId = promoCode.coupon.id
+				}
+			} catch (err) {
+				console.warn('Promotion code lookup failed:', err)
+			}
+		}
 
 	// Create subscription with incomplete status
 	// payment_behavior: 'default_incomplete' creates subscription + invoice but NOT payment intent
@@ -85,7 +106,9 @@ export async function POST(request: NextRequest) {
 			customer_name: customerData.name,
 			shipping_address: JSON.stringify(shippingAddress),
 			shipping_cost: '10.00',
+			...(promotionCode && { promotion_code: promotionCode }),
 		},
+		...(couponId && { coupon: couponId }),
 		...(trialPeriodDays && { trial_period_days: trialPeriodDays }),
 	}) as unknown as ExpandedSubscription
 
@@ -96,36 +119,41 @@ export async function POST(request: NextRequest) {
 		throw new Error('Subscription created but no invoice found')
 	}
 
-	if (!invoice.amount_due) {
-		throw new Error('Invoice has no amount due')
+	// If amount is $0 (100% discount), mark subscription as active and skip payment
+	let clientSecret: string | null = null
+	if (invoice.amount_due === 0) {
+		// Pay the $0 invoice to activate the subscription
+		await stripe.invoices.pay(invoice.id)
+		// Return a special indicator that no payment is needed
+		clientSecret = 'no_payment_required'
+	} else {
+		// Create a payment intent for the invoice amount
+		// We create a standalone payment intent and link it to the subscription/invoice via metadata
+		// When the payment succeeds, we'll handle it in the webhook to update the subscription
+		const paymentIntent = await stripe.paymentIntents.create({
+			amount: invoice.amount_due,
+			currency: invoice.currency || 'usd',
+			customer: stripeCustomer.id,
+			description: `Subscription payment for ${customer.email}`,
+			receipt_email: customer.email,
+			metadata: {
+				subscription_id: subscription.id,
+				invoice_id: invoice.id,
+				customer_id: stripeCustomer.id,
+				customer_email: customer.email,
+				...metadata,
+			},
+			automatic_payment_methods: {
+				enabled: true,
+			},
+		})
+
+		if (!paymentIntent.client_secret) {
+			throw new Error('Failed to create payment intent')
+		}
+
+		clientSecret = paymentIntent.client_secret
 	}
-
-	// Create a payment intent for the invoice amount
-	// We create a standalone payment intent and link it to the subscription/invoice via metadata
-	// When the payment succeeds, we'll handle it in the webhook to update the subscription
-	const paymentIntent = await stripe.paymentIntents.create({
-		amount: invoice.amount_due,
-		currency: invoice.currency || 'usd',
-		customer: stripeCustomer.id,
-		description: `Subscription payment for ${customer.email}`,
-		receipt_email: customer.email,
-		metadata: {
-			subscription_id: subscription.id,
-			invoice_id: invoice.id,
-			customer_id: stripeCustomer.id,
-			customer_email: customer.email,
-			...metadata,
-		},
-		automatic_payment_methods: {
-			enabled: true,
-		},
-	})
-
-	if (!paymentIntent.client_secret) {
-		throw new Error('Failed to create payment intent')
-	}
-
-	const clientSecret = paymentIntent.client_secret
 
 	// Audit log for subscription creation
 	console.info('AUDIT_LOG', {

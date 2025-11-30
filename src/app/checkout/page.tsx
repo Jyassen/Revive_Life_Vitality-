@@ -111,6 +111,9 @@ function CheckoutContent() {
 		specialInstructions: ''
 	})
 
+	const [promoCode, setPromoCode] = useState('')
+	const [promoCodeApplied, setPromoCodeApplied] = useState(false)
+
 	const states = [
 		{ value: 'AL', label: 'Alabama' },
 		{ value: 'AK', label: 'Alaska' },
@@ -323,6 +326,7 @@ function CheckoutContent() {
 					priceId: priceId,
 					customer: customerData,
 					shippingAddress: shippingData,
+					promotionCode: promoCode || undefined,
 					metadata: {
 						product_name: items[0]?.name || 'Revive Club',
 						special_instructions: formData.specialInstructions || '',
@@ -337,9 +341,19 @@ function CheckoutContent() {
 				return
 			}
 
+			// If no payment required (100% discount), redirect to success
+			if (data.clientSecret === 'no_payment_required') {
+				clearCart()
+				router.push('/checkout/success?subscription=true&free=true')
+				return
+			}
+
 			setClientSecret(data.clientSecret)
 			setSubscriptionId(data.subscriptionId)
 			setCustomerId(data.customerId)
+			if (promoCode) {
+				setPromoCodeApplied(true)
+			}
 			setCurrentStep('payment')
 
 		} catch (error) {
@@ -681,6 +695,35 @@ function CheckoutContent() {
 											</div>
 										</div>
 									</div>
+
+									{/* Promo Code */}
+									{isSubscription && (
+										<div className="bg-white rounded-2xl p-8 shadow-soft">
+											<h3 className="font-playfair text-xl mb-4 text-brand-dark">
+												Promotion Code
+											</h3>
+											<div className="flex gap-3">
+												<input
+													type="text"
+													placeholder="Enter promo code"
+													value={promoCode}
+													onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+													className="flex-1 px-4 py-3 border border-brand-brown/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-green"
+													disabled={promoCodeApplied}
+												/>
+												{promoCodeApplied && (
+													<span className="text-brand-green flex items-center px-4">
+														✓ Applied
+													</span>
+												)}
+											</div>
+											{promoCode && promoCodeApplied && (
+												<p className="text-sm text-brand-green mt-2">
+													Promotional discount will be applied at checkout
+												</p>
+											)}
+										</div>
+									)}
 
 									{/* Continue Button */}
 									<div className="bg-white rounded-2xl p-8 shadow-soft">
