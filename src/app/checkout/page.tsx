@@ -113,6 +113,7 @@ function CheckoutContent() {
 
 	const [promoCode, setPromoCode] = useState('')
 	const [promoCodeApplied, setPromoCodeApplied] = useState(false)
+	const [promoDiscount, setPromoDiscount] = useState(0)
 
 	const states = [
 		{ value: 'AL', label: 'Alabama' },
@@ -305,6 +306,9 @@ function CheckoutContent() {
 			setPaymentIntentId(data.paymentIntentId)
 			if (promoCode) {
 				setPromoCodeApplied(true)
+				if (data.discount) {
+					setPromoDiscount(parseFloat(data.discount))
+				}
 			}
 			setCurrentStep('payment')
 
@@ -364,6 +368,9 @@ function CheckoutContent() {
 			setCustomerId(data.customerId)
 			if (promoCode) {
 				setPromoCodeApplied(true)
+				if (data.discount) {
+					setPromoDiscount(parseFloat(data.discount))
+				}
 			}
 			setCurrentStep('payment')
 
@@ -821,11 +828,18 @@ function CheckoutContent() {
 										<span>${orderSummary?.shipping.toFixed(2) || '10.00'}</span>
 									</div>
 
+									{promoCodeApplied && promoDiscount > 0 && (
+										<div className="flex justify-between text-brand-green font-medium">
+											<span>Promo Code ({promoCode})</span>
+											<span>-${promoDiscount.toFixed(2)}</span>
+										</div>
+									)}
+
 									<div className="border-t border-brand-brown/20 pt-3">
 										<div className="flex justify-between text-xl font-medium text-brand-dark">
 											<span>Total</span>
 											<span>
-												${orderSummary?.total.toFixed(2) || (totalPrice + 10).toFixed(2)}
+												${((orderSummary?.total || (totalPrice + 10)) - promoDiscount).toFixed(2)}
 												{isSubscription && <span className="text-sm">/week</span>}
 											</span>
 										</div>

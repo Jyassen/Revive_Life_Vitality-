@@ -155,6 +155,12 @@ export async function POST(request: NextRequest) {
 		clientSecret = paymentIntent.client_secret
 	}
 
+	// Calculate discount if coupon was applied
+	let discountAmount = 0
+	if (invoice.total && invoice.amount_due !== invoice.total) {
+		discountAmount = (invoice.total - invoice.amount_due) / 100 // Convert cents to dollars
+	}
+
 	// Audit log for subscription creation
 	console.info('AUDIT_LOG', {
 		event: 'SUBSCRIPTION_CREATED',
@@ -164,6 +170,7 @@ export async function POST(request: NextRequest) {
 		priceId: priceId,
 		customerEmail: customer.email,
 		status: subscription.status,
+		discount: discountAmount,
 	})
 
 	// Return client secret and subscription details
@@ -172,6 +179,7 @@ export async function POST(request: NextRequest) {
 		clientSecret: clientSecret,
 		customerId: stripeCustomer.id,
 		status: subscription.status,
+		discount: discountAmount > 0 ? discountAmount.toFixed(2) : undefined,
 	})
 
 	} catch (error) {

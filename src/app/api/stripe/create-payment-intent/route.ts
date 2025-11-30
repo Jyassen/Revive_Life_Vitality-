@@ -145,7 +145,8 @@ export async function POST(request: NextRequest) {
 		return NextResponse.json({
 			clientSecret: paymentIntent.client_secret,
 			paymentIntentId: paymentIntent.id,
-			amount: summary.total,
+			amount: finalTotal,
+			discount: discountAmount > 0 ? discountAmount.toFixed(2) : undefined,
 		})
 
 	} catch (error) {
