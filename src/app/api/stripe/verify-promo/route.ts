@@ -36,9 +36,7 @@ export async function POST(request: NextRequest) {
 			})
 		}
 
-		const promoCode = promotionCodes.data[0] as Stripe.PromotionCode & { 
-			coupon: Stripe.Coupon 
-		}
+		const promoCode = promotionCodes.data[0]
 
 		if (!promoCode.active) {
 			return NextResponse.json({
@@ -47,12 +45,22 @@ export async function POST(request: NextRequest) {
 			})
 		}
 
+		// Get the coupon - it might be a string ID or expanded object
+		const promoCoupon = (promoCode as Stripe.Response<Stripe.PromotionCode> & { coupon: Stripe.Coupon | string }).coupon
+		let coupon: Stripe.Coupon
+		if (typeof promoCoupon === 'string') {
+			// Coupon wasn't expanded, fetch it
+			coupon = await stripe.coupons.retrieve(promoCoupon)
+		} else {
+			coupon = promoCoupon
+		}
+
 		// Return success with coupon details
 		let discountDescription = ''
-		if (promoCode.coupon.percent_off) {
-			discountDescription = `${promoCode.coupon.percent_off}% off`
-		} else if (promoCode.coupon.amount_off) {
-			discountDescription = `$${(promoCode.coupon.amount_off / 100).toFixed(2)} off`
+		if (coupon.percent_off) {
+			discountDescription = `${coupon.percent_off}% off`
+		} else if (coupon.amount_off) {
+			discountDescription = `$${(coupon.amount_off / 100).toFixed(2)} off`
 		}
 
 		return NextResponse.json({
