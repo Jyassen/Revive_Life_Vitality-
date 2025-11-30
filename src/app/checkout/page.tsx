@@ -293,7 +293,7 @@ function CheckoutContent() {
 				setPromoCodeError(data.message || 'Invalid promo code')
 				setPromoCodeApplied(false)
 			}
-		} catch (error) {
+		} catch (_error) {
 			setPromoCodeError('Failed to verify promo code')
 			setPromoCodeApplied(false)
 		} finally {
