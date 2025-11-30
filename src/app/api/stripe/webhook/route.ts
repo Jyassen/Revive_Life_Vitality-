@@ -149,25 +149,46 @@ async function handlePaymentIntentSucceeded(paymentIntent: Stripe.PaymentIntent)
 				? paymentIntent.payment_method 
 				: paymentIntent.payment_method?.id
 
-			if (!paymentMethodId) {
-				console.error('AUDIT_LOG', {
-					event: 'SUBSCRIPTION_PAYMENT_ERROR',
-					timestamp: new Date().toISOString(),
-					error: 'No payment method found on payment intent',
-					paymentIntentId: paymentIntent.id,
-				})
-				return
-			}
-
-			// Update the subscription with the payment method
-			await stripe.subscriptions.update(subscriptionId, {
-				default_payment_method: paymentMethodId,
+		if (!paymentMethodId) {
+			console.error('AUDIT_LOG', {
+				event: 'SUBSCRIPTION_PAYMENT_ERROR',
+				timestamp: new Date().toISOString(),
+				error: 'No payment method found on payment intent',
+				paymentIntentId: paymentIntent.id,
 			})
+			return
+		}
 
-			// Pay the invoice with the payment method
-			await stripe.invoices.pay(invoiceId, {
-				payment_method: paymentMethodId,
+		// Get customer ID from payment intent
+		const customerId = paymentIntent.metadata?.customer_id || 
+		                   (typeof paymentIntent.customer === 'string' 
+		                     ? paymentIntent.customer 
+		                     : paymentIntent.customer?.id)
+
+		if (!customerId) {
+			console.error('AUDIT_LOG', {
+				event: 'SUBSCRIPTION_PAYMENT_ERROR',
+				timestamp: new Date().toISOString(),
+				error: 'No customer ID found on payment intent',
+				paymentIntentId: paymentIntent.id,
 			})
+			return
+		}
+
+		// Step 1: Attach payment method to customer first
+		await stripe.paymentMethods.attach(paymentMethodId, {
+			customer: customerId,
+		})
+
+		// Step 2: Update the subscription with the payment method
+		await stripe.subscriptions.update(subscriptionId, {
+			default_payment_method: paymentMethodId,
+		})
+
+		// Step 3: Pay the invoice with the payment method
+		await stripe.invoices.pay(invoiceId, {
+			payment_method: paymentMethodId,
+		})
 
 			console.info('AUDIT_LOG', {
 				event: 'SUBSCRIPTION_INVOICE_PAID',
