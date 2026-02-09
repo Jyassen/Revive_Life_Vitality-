@@ -130,7 +130,7 @@ export function formatOrderForVendorEmail(orderData: OrderData): string {
   const lines = [
     'New order received.',
     '',
-    'Action: Please confirm payment in Clover for this order before fulfillment.',
+    'Action: Please review and fulfill this order.',
     '',
     'Customer',
     `- Name: ${orderData.customer.fullName}`,

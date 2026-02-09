@@ -182,6 +182,35 @@ function CheckoutContent() {
 		}))
 	}
 
+	// Fire-and-forget business notification after Step 1
+	const notifyOrderSelection = (
+		customerData: { firstName: string; lastName: string; email: string; phone: string; marketingConsent: boolean },
+		shippingData: { firstName: string; lastName: string; address1: string; address2: string; city: string; state: string; zipCode: string; country: string },
+	) => {
+		fetch('/api/order-selection', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				items: items.map(i => ({
+					id: i.id,
+					name: i.name,
+					price: parseFloat(i.price.replace('$', '')),
+					quantity: i.quantity,
+					image: i.image,
+					...('packageConfig' in i && i.packageConfig
+						? { packageConfig: i.packageConfig }
+						: {}),
+				})),
+				customer: customerData,
+				shippingAddress: shippingData,
+				summary: orderSummary,
+				specialInstructions: formData.specialInstructions || undefined,
+			}),
+		}).catch(err => {
+			console.error('Order selection notification failed:', err)
+		})
+	}
+
 	const handleCustomerShippingSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
 		clearErrors()
@@ -257,6 +286,9 @@ function CheckoutContent() {
 			
 			setCustomerInfo(customerData)
 			setShippingAddress(shippingData)
+
+			// Send business notification email (non-blocking)
+			notifyOrderSelection(customerData, shippingData)
 
 			// Create appropriate payment flow
 			if (isSubscription) {
